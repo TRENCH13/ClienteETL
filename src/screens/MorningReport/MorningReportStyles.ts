@@ -7,11 +7,8 @@ export const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#f5fdf7',
+        backgroundColor: '#F1F9F5',
         padding: 24,
-    },
-    containerDark: {
-        backgroundColor: '#1e1e1e',
     },
     themeSwitch: {
         position: 'absolute',
@@ -42,23 +39,23 @@ export const styles = StyleSheet.create({
         borderRadius: 6,
     },
     logo: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        alignSelf: 'center',
-        marginVertical: 12,
-        color: '#ff6a00',
+        width: 120,
+        height: 90,
+        alignItems: "center",
     },
     title: {
-        fontSize: 28,
+        fontSize: 64,
         fontWeight: 'bold',
         textAlign: 'center',
         color: '#000',
         marginBottom: 4,
+        marginTop: 55,
     },
     subtitle: {
-        fontSize: 16,
+        fontSize: 32,
         textAlign: 'center',
         marginBottom: 20,
+        marginTop: 20,
         color: '#333',
     },
     table: {
@@ -66,20 +63,23 @@ export const styles = StyleSheet.create({
     },
     tableHeader: {
         flexDirection: 'row',
-        backgroundColor: '#dcfce7',
+        backgroundColor: '#F1F9F5',
         paddingVertical: 10,
         borderRadius: 6,
     },
     tableRow: {
         flexDirection: 'row',
         paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderColor: '#e5e5e5',
+        borderBottomWidth: 0.5,
+        borderColor: '#F1F9F5',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        marginBottom: 5
     },
     tableCell: {
         flex: 1,
         textAlign: 'center',
-        fontSize: 14,
+        fontSize: 20,
         color: '#000',
     },
     pagination: {
@@ -97,19 +97,47 @@ export const styles = StyleSheet.create({
     },
 
     // DARK MODE
+    containerDark: {
+        backgroundColor: '#1e1e1e',
+    },
+    activeDark: {
+        color: '#ffffff',
+        backgroundColor: '#444',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 6,
+    },
     tableHeaderDark: {
-        backgroundColor: '#14532d',
+        backgroundColor: '#1e1e1e',
     },
     tableRowDark: {
-        borderColor: '#333',
+        flexDirection: 'row',
+        paddingVertical: 10,
+        borderBottomWidth: 0.5,
+        borderColor: '#F1F9F5',
+        backgroundColor: '#132623',
+        borderRadius: 10,
+        marginBottom: 5
     },
     tableCellDark: {
-        color: '#eee',
-    },
-    titleDark: {
+        flex: 1,
+        textAlign: 'center',
+        fontSize: 20,
         color: '#fff',
     },
+    titleDark: {
+        fontSize: 64,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#fff',
+        marginBottom: 4,
+        marginTop: 55,
+    },
     subtitleDark: {
-        color: '#ccc',
+        fontSize: 32,
+        textAlign: 'center',
+        marginBottom: 20,
+        marginTop: 20,
+        color: '#fff',
     },
 })

@@ -43,26 +43,26 @@ export default function MorningReportScreen() {
             </View>
 
             {/* Título */}
-            <Text style={styles.title}>Bienvenido</Text>
-            <Text style={styles.subtitle}>
+            <Text style={[styles.title, isDark && styles.titleDark]}>Bienvenido</Text>
+            <Text style={[styles.subtitle, isDark && styles.subtitleDark]}>
                 Este es el reporte matutino de ejecución del día de hoy:
             </Text>
 
             {/* Tabla */}
             <ScrollView style={styles.table}>
-                <View style={styles.tableHeader}>
-                    <Text style={styles.tableCell}>ID ⬇️</Text>
-                    <Text style={styles.tableCell}>Nombre del ETL</Text>
-                    <Text style={styles.tableCell}>Tipo</Text>
-                    <Text style={styles.tableCell}>Detalle</Text>
+                <View style={[styles.tableHeader, isDark && styles.tableHeaderDark]}>
+                    <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>ID ⬇️</Text>
+                    <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>Nombre del ETL</Text>
+                    <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>Tipo</Text>
+                    <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>Detalle</Text>
                 </View>
 
                 {dummyData.map((item) => (
-                    <View key={item.id} style={styles.tableRow}>
-                        <Text style={styles.tableCell}>{item.id}</Text>
-                        <Text style={styles.tableCell}>{item.name}</Text>
-                        <Text style={styles.tableCell}>{item.type}</Text>
-                        <Text style={styles.tableCell}>🔗</Text>
+                    <View key={item.id} style={[styles.tableRow, isDark && styles.tableRowDark]}>
+                        <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.id}</Text>
+                        <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.name}</Text>
+                            <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.type}</Text>
+                        <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>🔗</Text>
                     </View>
                 ))}
             </ScrollView>
