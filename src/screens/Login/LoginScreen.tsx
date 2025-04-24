@@ -9,12 +9,15 @@ import {
 import { useState } from 'react'
 import { styles } from './LoginStyles'
 import { useTheme } from '../../context/ThemeContext'
+import { useNavigate } from 'react-router-dom'
+
 
 
 export default function LoginScreen() {
     const { theme, toggleTheme } = useTheme()
     const isDark = theme === 'dark'
     const [isLoading, setIsLoading] = useState(false)
+    const navigate = useNavigate()
 
     return (
         <View style={[styles.root, isDark && styles.rootDark]}>
@@ -51,6 +54,7 @@ export default function LoginScreen() {
                         setIsLoading(true)
                         setTimeout(() => {
                             setIsLoading(false)
+                            navigate('/morning') // ← redirección a MorningReportScreen
                         }, 2000)
                     }}
                 >
