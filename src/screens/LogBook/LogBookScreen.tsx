@@ -2,6 +2,7 @@ import {Image, Pressable, Text, View} from "react-native";
 import {styles} from "../MorningReport/MorningReportStyles.ts";
 import {useTheme} from "../../context/ThemeContext.tsx";
 import {useNavigate} from "react-router-dom";
+import {ImExit} from "react-icons/im";
 
 export default function LogBookScreen() {
     const { theme, toggleTheme } = useTheme()
@@ -10,12 +11,23 @@ export default function LogBookScreen() {
 
     return (
         <View style={[styles.container, isDark && styles.containerDark]}>
-                {/* Botón de modo */}
-                <View style={styles.themeSwitch}>
-                    <Pressable onPress={toggleTheme}>
-                        <Text style={styles.themeIcon}>{isDark ? '🌞' : '🌙'}</Text>
-                    </Pressable>
-                </View>
+            {/* Botón de modo */}
+            <View style={styles.themeSwitch}>
+                <Pressable onPress={toggleTheme}>
+                    <Text style={styles.themeIcon}>{isDark ? '🌞' : '🌙'}</Text>
+                </Pressable>
+            </View>
+
+            <View style={styles.logoutBtn}>
+                <Pressable onPress={() => {
+                    const confirmLogout = window.confirm('¿Estás seguro de que deseas salir del sistema?');
+                    if (confirmLogout) {
+                        navigate('/');
+                    }
+                }}>
+                    <ImExit size={28} color={isDark ? '#ffffff' : '#000000'} />
+                </Pressable>
+            </View>
 
             {/* Header de navegación */}
             <View style={styles.navbar}>

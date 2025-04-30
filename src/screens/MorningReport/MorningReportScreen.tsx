@@ -8,6 +8,7 @@ import {useState} from "react";
 import { styles } from './MorningReportStyles'
 import { useTheme } from '../../context/ThemeContext'
 import {useNavigate} from "react-router-dom";
+import { ImExit } from "react-icons/im";
 
 export default function MorningReportScreen() {
     const { theme, toggleTheme } = useTheme()
@@ -15,7 +16,7 @@ export default function MorningReportScreen() {
 
     const [isAscending, setIsAscending] = useState(true);
     const [currentPage, setCurrentPage] = useState(0)
-    const rowsPerPage = 6
+    const rowsPerPage = 5
     const navigate = useNavigate()
 
     const [sortedData, setSortedData] = useState([
@@ -68,6 +69,17 @@ export default function MorningReportScreen() {
             <View style={styles.themeSwitch}>
                 <Pressable onPress={toggleTheme}>
                     <Text style={styles.themeIcon}>{isDark ? '🌞' : '🌙'}</Text>
+                </Pressable>
+            </View>
+
+            <View style={styles.logoutBtn}>
+                <Pressable onPress={() => {
+                    const confirmLogout = window.confirm('¿Estás seguro de que deseas salir del sistema?');
+                    if (confirmLogout) {
+                        navigate('/');
+                    }
+                }}>
+                    <ImExit size={28} color={isDark ? '#ffffff' : '#000000'} />
                 </Pressable>
             </View>
 

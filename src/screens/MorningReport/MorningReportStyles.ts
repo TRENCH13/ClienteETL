@@ -8,12 +8,18 @@ export const styles = StyleSheet.create({
         left: 0,
         right: 0,
         backgroundColor: '#F1F9F5',
-        padding: 24,
+        padding: 30,
     },
     themeSwitch: {
         position: 'absolute',
         bottom: 10,
         left: 20,
+        zIndex: 100,
+    },
+    logoutBtn:{
+        position: 'absolute',
+        bottom: 10,
+        right: 20,
         zIndex: 100,
     },
     themeIcon: {
@@ -49,7 +55,7 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#000',
         marginBottom: 4,
-        marginTop: 55,
+        marginTop: 30,
     },
     subtitle: {
         fontSize: 32,
@@ -136,7 +142,7 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#fff',
         marginBottom: 4,
-        marginTop: 55,
+        marginTop: 30,
     },
     subtitleDark: {
         fontSize: 32,
