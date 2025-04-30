@@ -1,0 +1,48 @@
+import {Image, Pressable, Text, View} from "react-native";
+import {styles} from "../MorningReport/MorningReportStyles.ts";
+import {useTheme} from "../../context/ThemeContext.tsx";
+import {useNavigate} from "react-router-dom";
+
+export default function EtlManagementScreen() {
+    const { theme, toggleTheme } = useTheme()
+    const isDark = theme === 'dark'
+    const navigate = useNavigate()
+
+    return (
+        <View style={[styles.container, isDark && styles.containerDark]}>
+            {/* Botón de modo */}
+            <View style={styles.themeSwitch}>
+                <Pressable onPress={toggleTheme}>
+                    <Text style={styles.themeIcon}>{isDark ? '🌞' : '🌙'}</Text>
+                </Pressable>
+            </View>
+
+            {/* Header de navegación */}
+            <View style={styles.navbar}>
+
+                <Pressable onPress={() => navigate('/morning')}>
+                    <Text style={[styles.navItem, isDark && styles.navItemDark]}>Reporte Matutino</Text>
+                </Pressable>
+
+                <Pressable onPress={() => navigate('/logbook')}>
+                    <Text style={[styles.navItem, isDark && styles.navItemDark]}>Bitácora de Reportes</Text>
+                </Pressable>
+
+                <Image
+                    source={{ uri: '/chedraui.png' }}
+                    style={styles.logo}
+                    resizeMode="contain"
+                />
+
+                <Pressable onPress={() => navigate('/etlmanage')}>
+                    <Text style={[styles.navItem, styles.active, isDark && styles.navItemDark]}>Gestión de ETLs</Text>
+                </Pressable>
+
+                <Pressable onPress={() => navigate('/accessmanage')}>
+                    <Text style={[styles.navItem, isDark && styles.navItemDark]}>Gestión de Permisos</Text>
+                </Pressable>
+
+            </View>
+        </View>
+    )
+}

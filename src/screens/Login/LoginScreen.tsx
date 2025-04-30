@@ -54,7 +54,7 @@ export default function LoginScreen() {
                         setIsLoading(true)
                         setTimeout(() => {
                             setIsLoading(false)
-                            navigate('/morning') // ← redirección a MorningReportScreen
+                            navigate('/morning')
                         }, 2000)
                     }}
                 >

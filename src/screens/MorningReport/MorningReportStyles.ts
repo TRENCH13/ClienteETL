@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
     },
     active: {
         color: '#ffffff',
-        backgroundColor: '#047857',
+        backgroundColor: '#555',
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 6,
@@ -100,9 +100,14 @@ export const styles = StyleSheet.create({
     containerDark: {
         backgroundColor: '#1e1e1e',
     },
+    navItemDark: {
+        fontSize: 14,
+        color: '#fff',
+        fontWeight: '500',
+    },
     activeDark: {
         color: '#ffffff',
-        backgroundColor: '#444',
+        backgroundColor: '#333',
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 6,

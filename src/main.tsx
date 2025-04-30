@@ -4,6 +4,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import LoginScreen from './screens/Login/LoginScreen'
 import MorningReportScreen from './screens/MorningReport/MorningReportScreen'
 import { ThemeProvider } from './context/ThemeContext'
+import LogBookScreen from "./screens/LogBook/LogBookScreen.tsx";
+import EtlManagementScreen from "./screens/EtlManagement/EtlManagementScreen.tsx";
+import AccessManagementScreen from "./screens/AccessManagement/AccessManagementScreen.tsx";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
@@ -12,6 +15,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 <Routes>
                     <Route path="/" element={<LoginScreen />} />
                     <Route path="/morning" element={<MorningReportScreen />} />
+                    <Route path="/logbook" element={<LogBookScreen />} />
+                    <Route path="/etlmanage" element={<EtlManagementScreen />} />
+                    <Route path="/accessmanage" element={<AccessManagementScreen />} />
                 </Routes>
             </BrowserRouter>
         </ThemeProvider>
