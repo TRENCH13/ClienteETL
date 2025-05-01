@@ -1,4 +1,4 @@
-import {Image, Pressable, ScrollView, Text, View} from "react-native";
+import {ActivityIndicator, Image, Pressable, ScrollView, Text, View} from "react-native";
 import {styles} from "./EtlManagementStyles.ts";
 import {useTheme} from "../../context/ThemeContext.tsx";
 import {useNavigate} from "react-router-dom";
@@ -13,6 +13,9 @@ export default function EtlManagementScreen() {
     const [isAscending, setIsAscending] = useState(true);
     const [currentPage, setCurrentPage] = useState(0)
     const [searchQuery, setSearchQuery] = useState('');
+    const [modalVisible, setModalVisible] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+
     const rowsPerPage = 5
 
     const [sortedData, setSortedData] = useState([
@@ -110,7 +113,10 @@ export default function EtlManagementScreen() {
             <Text style={[styles.title, isDark && styles.titleDark]}>Gestión de ETLs</Text>
 
             {/* Botón de Agregar */}
-            <Pressable style={[styles.addBtn, isDark && styles.addBtnDark]}>
+            <Pressable
+                style={[styles.addBtn, isDark && styles.addBtnDark]}
+                onPress={() => setModalVisible(true)}
+            >
                 <Text style={[styles.addBtnTxt, isDark && styles.addBtnDark]}>Agregar ETL</Text>
             </Pressable>
 
@@ -124,7 +130,7 @@ export default function EtlManagementScreen() {
                     value={searchQuery}
                     onChange={(e) => {
                         setSearchQuery(e.target.value);
-                        setCurrentPage(0); // Reinicia a la primera página al buscar
+                        setCurrentPage(0);
                     }}
                     style={{
                         marginTop: 8,
@@ -167,7 +173,7 @@ export default function EtlManagementScreen() {
                     </View>
                 ))}
             </ScrollView>
-            
+
             {/* Paginación */}
             <View style={styles.pagination}>
                 {/* Botón anterior */}
@@ -199,6 +205,132 @@ export default function EtlManagementScreen() {
                     </Text>
                 </Pressable>
             </View>
+
+            {modalVisible && (
+                <View style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 999,
+                }}>
+                    <View style={{
+                        backgroundColor: isDark ? '#1e1e1e' : '#f1f9f5',
+                        padding: 40,
+                        borderRadius: 20,
+                        width: '90%',
+                        maxWidth: 500,
+                        position: 'relative',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
+                    }}>
+
+                        {/* Botón Cerrar */}
+                        <Pressable
+                            onPress={() => setModalVisible(false)}
+                            style={{
+                                position: 'absolute',
+                                top: 10,
+                                left: 10,
+                                width: 32,
+                                height: 32,
+                                borderRadius: 4,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                backgroundColor: '#fff'
+                            }}
+                        >
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#000' }}>✕</Text>
+                        </Pressable>
+
+                        {/* Título */}
+                        <Text style={{
+                            fontSize: 28,
+                            fontWeight: 'bold',
+                            textAlign: 'center',
+                            marginBottom: 30,
+                            color: isDark ? '#fff' : '#000'
+                        }}>
+                            Crea un ETL
+                        </Text>
+
+                        {/* Input: Nombre del ETL */}
+                        <Text style={{ fontWeight: '600', marginBottom: 4, color: isDark ? '#fff' : '#000' }}>Nombre del ETL</Text>
+                        <input
+                            type="text"
+                            placeholder="ETL Crítico"
+                            style={{
+                                padding: 10,
+                                borderRadius: 6,
+                                border: '1px solid #ccc',
+                                width: '100%',
+                                marginBottom: 16,
+                                fontSize: 14
+                            }}
+                        />
+
+                        {/* Input: Descripción del ETL */}
+                        <Text style={{ fontWeight: '600', marginBottom: 4, color: isDark ? '#fff' : '#000' }}>Descripción del ETL</Text>
+                        <input
+                            type="text"
+                            placeholder="Este es un ETL de carácter crítico"
+                            style={{
+                                padding: 10,
+                                borderRadius: 6,
+                                border: '1px solid #ccc',
+                                width: '100%',
+                                marginBottom: 16,
+                                fontSize: 14
+                            }}
+                        />
+
+                        {/* Selector: Tipo de ETL */}
+                        <Text style={{ fontWeight: '600', marginBottom: 4, color: isDark ? '#fff' : '#000' }}>Tipo de ETL</Text>
+                        <select
+                            style={{
+                                padding: 10,
+                                borderRadius: 6,
+                                border: '1px solid #ccc',
+                                width: '100%',
+                                marginBottom: 30,
+                                fontSize: 14
+                            }}
+                        >
+                            <option>Archivo</option>
+                            <option>Alerta</option>
+                            <option>Procesamiento</option>
+                        </select>
+
+                        {/* Botón Guardar */}
+                        <Pressable
+                            onPress={() => {
+                                setIsLoading(true)
+                                setTimeout(() => {
+                                    setIsLoading(false)
+                                    alert('ETL guardado')
+                                    setModalVisible(false)
+                                }, 2000)
+                            }}
+                            style={{
+                                backgroundColor: '#555',
+                                paddingVertical: 12,
+                                paddingHorizontal: 20,
+                                borderRadius: 6,
+                                alignSelf: 'center',
+                            }}
+                        >
+                            {isLoading ? (
+                                <ActivityIndicator size="small" color="#fff" />
+                            ) : (
+                                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
+                                    Guardar ETL
+                                </Text>
+                            )}
+
+                        </Pressable>
+                    </View>
+                </View>
+            )}
 
 
         </View>
