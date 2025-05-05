@@ -237,7 +237,7 @@ export default function EtlManagementScreen() {
                                 borderRadius: 4,
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                backgroundColor: '#fff'
+                                backgroundColor: '#f1f9f5'
                             }}
                         >
                             <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#000' }}>✕</Text>
