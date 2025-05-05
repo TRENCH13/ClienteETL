@@ -137,7 +137,7 @@ export default function AccessManagementScreen() {
 
                 <Pressable
                     style={[styles.addBtn, isDark && styles.addBtnDark]}
-                    onPress={() => console.log("Btn Presionado")}
+                    onPress={() =>  navigate('/newuser')}
                 >
                     <Text style={[styles.addBtnTxt, isDark && styles.addBtnDark]}>Agregar Usuario</Text>
                 </Pressable>

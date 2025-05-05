@@ -7,6 +7,7 @@ import { ThemeProvider } from './context/ThemeContext'
 import LogBookScreen from "./screens/LogBook/LogBookScreen.tsx";
 import EtlManagementScreen from "./screens/EtlManagement/EtlManagementScreen.tsx";
 import AccessManagementScreen from "./screens/AccessManagement/AccessManagementScreen.tsx";
+ import NewUserScreen from "./screens/NewUser/NewUserScreen.tsx";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     <Route path="/logbook" element={<LogBookScreen />} />
                     <Route path="/etlmanage" element={<EtlManagementScreen />} />
                     <Route path="/accessmanage" element={<AccessManagementScreen />} />
+                    <Route path="/newuser" element={<NewUserScreen />} />
                 </Routes>
             </BrowserRouter>
         </ThemeProvider>
