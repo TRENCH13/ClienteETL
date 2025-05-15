@@ -1,10 +1,14 @@
 // components/BackButton.tsx
 import { useNavigate } from 'react-router-dom'
-import { IoArrowBackCircleOutline } from "react-icons/io5";
+import { IoArrowBackCircleOutline } from "react-icons/io5"
 import { Pressable } from 'react-native'
+import { useTheme } from "../context/ThemeContext.tsx"
 
 export default function BackButton() {
     const navigate = useNavigate()
+
+    const { theme } = useTheme()
+    const isDark = theme === 'dark'
 
     return (
         <Pressable
@@ -19,7 +23,10 @@ export default function BackButton() {
                 gap: 8
             }}
         >
-            <IoArrowBackCircleOutline size={60} />
+            <IoArrowBackCircleOutline
+                size={60}
+                color={isDark ? '#FFFFFF' : '#1B1B1B'}
+            />
         </Pressable>
     )
 }
