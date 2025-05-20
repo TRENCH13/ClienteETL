@@ -1,14 +1,12 @@
-import {ActivityIndicator, Image, Pressable, ScrollView, Text, View} from "react-native";
+import {ActivityIndicator, Pressable, ScrollView, Text, View} from "react-native";
 import {styles} from "./EtlManagementStyles.ts";
-import {useTheme} from "../../context/ThemeContext.tsx";
-import {useNavigate} from "react-router-dom";
-import {ImExit} from "react-icons/im";
+import PageLayout from "../../components/PageLayout.tsx";
 import {useState} from "react";
+import {useTheme} from "../../context/ThemeContext.tsx";
 
 export default function EtlManagementScreen() {
-    const { theme, toggleTheme } = useTheme()
+    const { theme } = useTheme()
     const isDark = theme === 'dark'
-    const navigate = useNavigate()
 
     const [isAscending, setIsAscending] = useState(true);
     const [currentPage, setCurrentPage] = useState(0)
@@ -63,52 +61,131 @@ export default function EtlManagementScreen() {
     }
 
     return (
-        <View style={[styles.container, isDark && styles.containerDark]}>
-            {/* Botón de modo */}
-            <View style={styles.themeSwitch}>
-                <Pressable onPress={toggleTheme}>
-                    <Text style={styles.themeIcon}>{isDark ? '🌞' : '🌙'}</Text>
-                </Pressable>
-            </View>
+        <PageLayout
+            overlay={
+                modalVisible && (
+                    <View style={{
+                        position: 'absolute',
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 999,
+                    }}>
+                        <View style={{
+                            backgroundColor: isDark ? '#1e1e1e' : '#f1f9f5',
+                            padding: 40,
+                            borderRadius: 20,
+                            width: '90%',
+                            maxWidth: 500,
+                            position: 'relative',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
+                        }}>
+                            {/* Botón cerrar */}
+                            <Pressable
+                                onPress={() => setModalVisible(false)}
+                                style={{
+                                    position: 'absolute',
+                                    top: 10,
+                                    left: 10,
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: 4,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    backgroundColor: '#f1f9f5'
+                                }}
+                            >
+                                <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#000' }}>✕</Text>
+                            </Pressable>
 
-            <View style={styles.logoutBtn}>
-                <Pressable onPress={() => {
-                    const confirmLogout = window.confirm('¿Estás seguro de que deseas salir del sistema?');
-                    if (confirmLogout) {
-                        navigate('/');
-                    }
-                }}>
-                    <ImExit size={28} color={isDark ? '#ffffff' : '#000000'} />
-                </Pressable>
-            </View>
+                            {/* Título */}
+                            <Text style={{
+                                fontSize: 28,
+                                fontWeight: 'bold',
+                                textAlign: 'center',
+                                marginBottom: 30,
+                                color: isDark ? '#fff' : '#000'
+                            }}>
+                                Crea un ETL
+                            </Text>
 
-            {/* Header de navegación */}
-            <View style={styles.navbar}>
+                            {/* Inputs */}
+                            <Text style={{ fontWeight: '600', marginBottom: 4, color: isDark ? '#fff' : '#000' }}>Nombre del ETL</Text>
+                            <input
+                                type="text"
+                                placeholder="ETL Crítico"
+                                style={{
+                                    padding: 10,
+                                    borderRadius: 6,
+                                    border: '1px solid #ccc',
+                                    width: '100%',
+                                    marginBottom: 16,
+                                    fontSize: 14
+                                }}
+                            />
 
-                <Pressable onPress={() => navigate('/morning')}>
-                    <Text style={[styles.navItem, isDark && styles.navItemDark]}>Reporte Matutino</Text>
-                </Pressable>
+                            <Text style={{ fontWeight: '600', marginBottom: 4, color: isDark ? '#fff' : '#000' }}>Descripción del ETL</Text>
+                            <input
+                                type="text"
+                                placeholder="Este es un ETL de carácter crítico"
+                                style={{
+                                    padding: 10,
+                                    borderRadius: 6,
+                                    border: '1px solid #ccc',
+                                    width: '100%',
+                                    marginBottom: 16,
+                                    fontSize: 14
+                                }}
+                            />
 
-                <Pressable onPress={() => navigate('/logbook')}>
-                    <Text style={[styles.navItem, isDark && styles.navItemDark]}>Bitácora de Reportes</Text>
-                </Pressable>
+                            <Text style={{ fontWeight: '600', marginBottom: 4, color: isDark ? '#fff' : '#000' }}>Tipo de ETL</Text>
+                            <select
+                                style={{
+                                    padding: 10,
+                                    borderRadius: 6,
+                                    border: '1px solid #ccc',
+                                    width: '100%',
+                                    marginBottom: 30,
+                                    fontSize: 14
+                                }}
+                            >
+                                <option>Archivo</option>
+                                <option>Alerta</option>
+                                <option>Procesamiento</option>
+                            </select>
 
-                <Image
-                    source={{ uri: '/chedraui.png' }}
-                    style={styles.logo}
-                    resizeMode="contain"
-                />
-
-                <Pressable onPress={() => navigate('/etlmanage')}>
-                    <Text style={[styles.navItem, styles.active, isDark && styles.navItemDark]}>Gestión de ETLs</Text>
-                </Pressable>
-
-                <Pressable onPress={() => navigate('/accessmanage')}>
-                    <Text style={[styles.navItem, isDark && styles.navItemDark]}>Gestión de Permisos</Text>
-                </Pressable>
-
-            </View>
-
+                            {/* Botón guardar */}
+                            <Pressable
+                                onPress={() => {
+                                    setIsLoading(true)
+                                    setTimeout(() => {
+                                        setIsLoading(false)
+                                        alert('ETL guardado')
+                                        setModalVisible(false)
+                                    }, 2000)
+                                }}
+                                style={{
+                                    backgroundColor: '#555',
+                                    paddingVertical: 12,
+                                    paddingHorizontal: 20,
+                                    borderRadius: 6,
+                                    alignSelf: 'center',
+                                }}
+                            >
+                                {isLoading ? (
+                                    <ActivityIndicator size="small" color="#fff" />
+                                ) : (
+                                    <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
+                                        Guardar ETL
+                                    </Text>
+                                )}
+                            </Pressable>
+                        </View>
+                    </View>
+                )
+            }
+        >
             {/* Título y Subititulo */}
             <Text style={[styles.title, isDark && styles.titleDark]}>Gestión de ETLs</Text>
 
@@ -205,134 +282,6 @@ export default function EtlManagementScreen() {
                     </Text>
                 </Pressable>
             </View>
-
-            {modalVisible && (
-                <View style={{
-                    position: 'absolute',
-                    top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    zIndex: 999,
-                }}>
-                    <View style={{
-                        backgroundColor: isDark ? '#1e1e1e' : '#f1f9f5',
-                        padding: 40,
-                        borderRadius: 20,
-                        width: '90%',
-                        maxWidth: 500,
-                        position: 'relative',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-                    }}>
-
-                        {/* Botón Cerrar */}
-                        <Pressable
-                            onPress={() => setModalVisible(false)}
-                            style={{
-                                position: 'absolute',
-                                top: 10,
-                                left: 10,
-                                width: 32,
-                                height: 32,
-                                borderRadius: 4,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                backgroundColor: '#f1f9f5'
-                            }}
-                        >
-                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#000' }}>✕</Text>
-                        </Pressable>
-
-                        {/* Título */}
-                        <Text style={{
-                            fontSize: 28,
-                            fontWeight: 'bold',
-                            textAlign: 'center',
-                            marginBottom: 30,
-                            color: isDark ? '#fff' : '#000'
-                        }}>
-                            Crea un ETL
-                        </Text>
-
-                        {/* Input: Nombre del ETL */}
-                        <Text style={{ fontWeight: '600', marginBottom: 4, color: isDark ? '#fff' : '#000' }}>Nombre del ETL</Text>
-                        <input
-                            type="text"
-                            placeholder="ETL Crítico"
-                            style={{
-                                padding: 10,
-                                borderRadius: 6,
-                                border: '1px solid #ccc',
-                                width: '100%',
-                                marginBottom: 16,
-                                fontSize: 14
-                            }}
-                        />
-
-                        {/* Input: Descripción del ETL */}
-                        <Text style={{ fontWeight: '600', marginBottom: 4, color: isDark ? '#fff' : '#000' }}>Descripción del ETL</Text>
-                        <input
-                            type="text"
-                            placeholder="Este es un ETL de carácter crítico"
-                            style={{
-                                padding: 10,
-                                borderRadius: 6,
-                                border: '1px solid #ccc',
-                                width: '100%',
-                                marginBottom: 16,
-                                fontSize: 14
-                            }}
-                        />
-
-                        {/* Selector: Tipo de ETL */}
-                        <Text style={{ fontWeight: '600', marginBottom: 4, color: isDark ? '#fff' : '#000' }}>Tipo de ETL</Text>
-                        <select
-                            style={{
-                                padding: 10,
-                                borderRadius: 6,
-                                border: '1px solid #ccc',
-                                width: '100%',
-                                marginBottom: 30,
-                                fontSize: 14
-                            }}
-                        >
-                            <option>Archivo</option>
-                            <option>Alerta</option>
-                            <option>Procesamiento</option>
-                        </select>
-
-                        {/* Botón Guardar */}
-                        <Pressable
-                            onPress={() => {
-                                setIsLoading(true)
-                                setTimeout(() => {
-                                    setIsLoading(false)
-                                    alert('ETL guardado')
-                                    setModalVisible(false)
-                                }, 2000)
-                            }}
-                            style={{
-                                backgroundColor: '#555',
-                                paddingVertical: 12,
-                                paddingHorizontal: 20,
-                                borderRadius: 6,
-                                alignSelf: 'center',
-                            }}
-                        >
-                            {isLoading ? (
-                                <ActivityIndicator size="small" color="#fff" />
-                            ) : (
-                                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
-                                    Guardar ETL
-                                </Text>
-                            )}
-
-                        </Pressable>
-                    </View>
-                </View>
-            )}
-
-
-        </View>
+        </PageLayout>
     )
 }

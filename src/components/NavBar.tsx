@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Image } from 'react-native'
+import { View, Text, Pressable, Image, TextStyle } from 'react-native'
 import { useTheme } from '../context/ThemeContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { styles } from '../screens/NewUser/NewUserStyles'
@@ -9,24 +9,37 @@ export default function Navbar() {
     const navigate = useNavigate()
     const location = useLocation()
 
-    const isActive = (path: string) => location.pathname === path
+    const isActive = (path: string) => location.pathname.startsWith(path)
+
+
+    const getNavItemStyle = (path: string): TextStyle => ({
+        color: isActive(path)
+            ? '#fff'
+            : isDark
+                ? '#fff'
+                : '#000',
+        fontWeight: isActive(path) ? 'bold' : 'normal',
+        borderBottomWidth: isActive(path) ? 2 : 0,
+        backgroundColor: isActive(path)
+            ? '#555'
+            : isDark
+                ? '#1e1e1e'
+                : '#F1F9F5',
+        marginHorizontal: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        fontSize: 16,
+        borderRadius: 6,
+    })
 
     return (
         <View style={styles.navbar}>
             <Pressable onPress={() => navigate('/morning')}>
-                <Text style={[
-                    styles.navItem,
-                    isDark && styles.navItemDark,
-                    isActive('/morning') && styles.active
-                ]}>Reporte Matutino</Text>
+                <Text style={getNavItemStyle('/morning')}>Reporte Matutino</Text>
             </Pressable>
 
             <Pressable onPress={() => navigate('/logbook')}>
-                <Text style={[
-                    styles.navItem,
-                    isDark && styles.navItemDark,
-                    isActive('/logbook') && styles.active
-                ]}>Bitácora de Reportes</Text>
+                <Text style={getNavItemStyle('/logbook')}>Bitácora de Reportes</Text>
             </Pressable>
 
             <Image
@@ -36,19 +49,11 @@ export default function Navbar() {
             />
 
             <Pressable onPress={() => navigate('/etlmanage')}>
-                <Text style={[
-                    styles.navItem,
-                    isDark && styles.navItemDark,
-                    isActive('/etlmanage') && styles.active
-                ]}>Gestión de ETLs</Text>
+                <Text style={getNavItemStyle('/etlmanage')}>Gestión de ETLs</Text>
             </Pressable>
 
             <Pressable onPress={() => navigate('/accessmanage')}>
-                <Text style={[
-                    styles.navItem,
-                    isDark && styles.navItemDark,
-                    isActive('/accessmanage') && styles.active
-                ]}>Gestión de Permisos</Text>
+                <Text style={getNavItemStyle('/accessmanage')}>Gestión de Permisos</Text>
             </Pressable>
         </View>
     )

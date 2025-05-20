@@ -15,7 +15,7 @@ export default function BackButton() {
             onPress={() => navigate(-1)}
             style={{
                 position: 'absolute',
-                top: 180,
+                top: 30,
                 left: 30,
                 zIndex: 10,
                 flexDirection: 'row',

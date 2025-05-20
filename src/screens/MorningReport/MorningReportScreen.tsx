@@ -2,22 +2,21 @@ import {
     View,
     Text,
     Pressable,
-    ScrollView, Image
+    ScrollView,
 } from 'react-native'
 import {useState} from "react";
 import { styles } from './MorningReportStyles'
-import { useTheme } from '../../context/ThemeContext'
-import {useNavigate} from "react-router-dom";
-import { ImExit } from "react-icons/im";
+import PageLayout from "../../components/PageLayout.tsx";
+import {useTheme} from "../../context/ThemeContext.tsx";
 
 export default function MorningReportScreen() {
-    const { theme, toggleTheme } = useTheme()
+    const { theme } = useTheme()
     const isDark = theme === 'dark'
 
     const [isAscending, setIsAscending] = useState(true);
     const [currentPage, setCurrentPage] = useState(0)
     const rowsPerPage = 5
-    const navigate = useNavigate()
+
 
     const [sortedData, setSortedData] = useState([
         { id: '013', name: 'Lorem ipsum dolor sit amet', type: 'Procesamiento' },
@@ -64,50 +63,7 @@ export default function MorningReportScreen() {
     }
 
     return (
-        <View style={[styles.container, isDark && styles.containerDark]}>
-            {/* Botón de modo */}
-            <View style={styles.themeSwitch}>
-                <Pressable onPress={toggleTheme}>
-                    <Text style={styles.themeIcon}>{isDark ? '🌞' : '🌙'}</Text>
-                </Pressable>
-            </View>
-
-            <View style={styles.logoutBtn}>
-                <Pressable onPress={() => {
-                    const confirmLogout = window.confirm('¿Estás seguro de que deseas salir del sistema?');
-                    if (confirmLogout) {
-                        navigate('/');
-                    }
-                }}>
-                    <ImExit size={28} color={isDark ? '#ffffff' : '#000000'} />
-                </Pressable>
-            </View>
-
-            {/* Header de navegación */}
-            <View style={styles.navbar}>
-
-                <Text style={[styles.navItem, styles.active, isDark && styles.activeDark]}>Reporte Matutino</Text>
-
-                <Pressable onPress={() => navigate('/logbook')}>
-                    <Text style={[styles.navItem, isDark && styles.navItemDark]}>Bitácora de Reportes</Text>
-                </Pressable>
-
-                <Image
-                    source={{ uri: '/chedraui.png' }}
-                    style={styles.logo}
-                    resizeMode="contain"
-                />
-
-                <Pressable onPress={() => navigate('/etlmanage')}>
-                    <Text style={[styles.navItem, isDark && styles.navItemDark]}>Gestión de ETLs</Text>
-                </Pressable>
-
-                <Pressable onPress={() => navigate('/accessmanage')}>
-                    <Text style={[styles.navItem, isDark && styles.navItemDark]}>Gestión de Permisos</Text>
-                </Pressable>
-
-            </View>
-
+        <PageLayout>
             {/* Título y Subititulo */}
             <Text style={[styles.title, isDark && styles.titleDark]}>Bienvenido</Text>
             <Text style={[styles.subtitle, isDark && styles.subtitleDark]}>
@@ -155,6 +111,6 @@ export default function MorningReportScreen() {
                     <Text style={[styles.pageBtn, currentPage === totalPages - 1 && { opacity: 0.4 }]}>Siguiente</Text>
                 </Pressable>
             </View>
-        </View>
+        </PageLayout>
     )
 }

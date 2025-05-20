@@ -19,7 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     <Route path="/logbook" element={<LogBookScreen />} />
                     <Route path="/etlmanage" element={<EtlManagementScreen />} />
                     <Route path="/accessmanage" element={<AccessManagementScreen />} />
-                    <Route path="/newuser" element={<NewUserScreen />} />
+                    <Route path="/accessmanage/newuser" element={<NewUserScreen />} />
                 </Routes>
             </BrowserRouter>
         </ThemeProvider>

@@ -1,24 +1,22 @@
 import {
     View,
     Text,
-    ScrollView,
     TextInput,
 } from 'react-native'
 import {styles} from "../AccessManagement/AccessManagementStyles.ts";
-import ThemeSwitch from "../../components/ThemeSwitch.tsx";
-import Navbar from "../../components/NavBar.tsx";
 import ETLAccessCard from "../../components/EtlAccessCard.tsx";
 import {useTheme} from "../../context/ThemeContext.tsx";
+import PageLayout from "../../components/PageLayout.tsx";
 import BackButton from "../../components/BackButton.tsx";
+import SearchBar from "../../components/SearchBar.tsx";
 import {useState, useEffect} from "react";
 
 export default function NewUserScreen() {
     const { theme } = useTheme()
     const isDark = theme === 'dark'
-
     const [searchETLQuery, setSearchETLQuery] = useState('');
-
-    const [etlStates, setEtlStates] = useState<{ id: string, name: string, enabled: boolean }[]>([])
+    const [etlStates, setEtlStates] = useState<{ id: string, name: string, enabled: boolean }[]>([]);
+    const [allEnabled, setAllEnabled] = useState(false);
 
 
     useEffect(() => {
@@ -33,6 +31,16 @@ export default function NewUserScreen() {
             { id: '046', name: 'ETL Financiera', enabled: false },
         ])
     }, [])
+
+    useEffect(() => {
+        const everyEnabled = etlStates.length > 0 && etlStates.every(etl => etl.enabled);
+        setAllEnabled(everyEnabled);
+    }, [etlStates]);
+
+    const toggleAllETLs = () => {
+        const newState = !allEnabled;
+        setEtlStates(prev => prev.map(etl => ({ ...etl, enabled: newState })));
+    };
 
     const handleToggleETL = (id: string, value: boolean) => {
         setEtlStates(prev =>
@@ -51,16 +59,13 @@ export default function NewUserScreen() {
 
 
     return(
-        <ScrollView style={[styles.container, isDark && styles.containerDark]}>
-            <ThemeSwitch />
-            <Navbar />
+        <PageLayout>
             <BackButton />
-
             <Text style={[styles.title, isDark && styles.titleDark]}>
                 Crea un Nuevo Usuario
             </Text>
 
-            {/* Buscador de usuario */}
+            {/* Input de nombre de nuevo usuario */}
             <View style={{ alignItems: 'center', marginTop: 40 }}>
                 <TextInput
                     placeholder="Buscar..."
@@ -82,10 +87,29 @@ export default function NewUserScreen() {
 
             </View>
 
+
             {/* ETLs activados */}
             <Text style={[styles.subtitle, isDark && styles.subtitleDark]}>
-                Tiene acceso a estos ETL:
+                Va a tener acceso a estos ETL:
             </Text>
+            <View style={{ alignItems: 'center', marginTop: 10 }}>
+                <Text
+                    onPress={toggleAllETLs}
+                    style={{
+                        paddingVertical: 8,
+                        paddingHorizontal: 16,
+                        borderRadius: 12,
+                        backgroundColor: isDark ? '#333' : '#555',
+                        color:'#fff',
+                        fontSize: 14,
+                        textAlign: 'center',
+                        alignSelf: 'center',
+                    }}
+                >
+                    {allEnabled ? 'Deshabilitar todos' : 'Habilitar todos'}
+                </Text>
+            </View>
+
             <View style={{
                 flexDirection: 'row',
                 flexWrap: 'wrap',
@@ -109,30 +133,12 @@ export default function NewUserScreen() {
             </Text>
 
             {/* Buscador de ETLs disponibles */}
-            <View style={{ alignItems: 'center', marginTop: 16 }}>
-                <input
-                    type="text"
-                    placeholder="ej. Lorem ipsum dolor sit amet"
-                    value={searchETLQuery}
-                    onChange={(e) => setSearchETLQuery(e.target.value)}
-                    style={{
-                        padding: '8px 12px',
-                        borderRadius: 20,
-                        border: '1px solid #ccc',
-                        width: 300,
-                        fontSize: 16,
-                        textAlign: 'center',
-                    }}
-                />
-                <Text style={{
-                    fontSize: 14,
-                    color: isDark ? '#ccc' : '#777',
-                    marginTop: 4,
-                    fontStyle: 'italic'
-                }}>
-                    Nombre de ETL
-                </Text>
-            </View>
+            <SearchBar
+                placeholder="Busca un ETL por ID o por nombre"
+                value={searchETLQuery}
+                onChangeText={setSearchETLQuery}
+            />
+
 
             <View style={{
                 flexDirection: 'row',
@@ -151,6 +157,6 @@ export default function NewUserScreen() {
                     />
                 ))}
             </View>
-        </ScrollView>
+        </PageLayout>
     )
 }

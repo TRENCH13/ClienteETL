@@ -17,18 +17,25 @@ export default function ThemeSwitch() {
     }
 
     return (
-        <>
-            <View style={styles.themeSwitch}>
-                <Pressable onPress={toggleTheme}>
-                    <Text style={styles.themeIcon}>{isDark ? '🌞' : '🌙'}</Text>
-                </Pressable>
-            </View>
+        <View style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: 16,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: isDark ? '#1e1e1e' : '#f5f5f5',
+            zIndex: 1000,
+        }}>
+            <Pressable onPress={toggleTheme}>
+                <Text style={styles.themeIcon}>{isDark ? '🌞' : '🌙'}</Text>
+            </Pressable>
 
-            <View style={styles.logoutBtn}>
-                <Pressable onPress={handleLogout}>
-                    <ImExit size={28} color={isDark ? '#ffffff' : '#000000'} />
-                </Pressable>
-            </View>
-        </>
+            <Pressable onPress={handleLogout}>
+                <ImExit size={28} color={isDark ? '#ffffff' : '#000000'} />
+            </Pressable>
+        </View>
     )
 }
