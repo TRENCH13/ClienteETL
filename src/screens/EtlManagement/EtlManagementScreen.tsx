@@ -1,6 +1,7 @@
-import {ActivityIndicator, Pressable, ScrollView, Text, View} from "react-native";
+import {ActivityIndicator, Pressable, Text, View} from "react-native";
 import {styles} from "./EtlManagementStyles.ts";
 import PageLayout from "../../components/PageLayout.tsx";
+import ReusableTable from "../../components/Table.tsx";
 import {useState} from "react";
 import {useTheme} from "../../context/ThemeContext.tsx";
 
@@ -27,6 +28,13 @@ export default function EtlManagementScreen() {
         { id: '141', name: 'Lorem ipsum dolor sit amet', type: 'Archivo' },
     ]);
 
+    const headers = [
+        { key: 'id', label: 'ID del ETL', sortable: true, ascending: isAscending },
+        { key: 'name', label: 'Nombre del ETL' },
+        { key: 'type', label: 'Tipo' },
+        { key: 'detail', label: 'Detalle' }
+    ];
+
     const toggleSort = () => {
         const sorted = [...sortedData].sort((a, b) => {
             const idAb = parseInt(a.id, 10);
@@ -40,6 +48,10 @@ export default function EtlManagementScreen() {
         setSortedData(sorted);
         setIsAscending(!isAscending);
         setCurrentPage(0)
+    };
+
+    const handleSort = (key: string) => {
+        if (key === 'id') toggleSort();
     };
 
     const filteredData = sortedData.filter(item =>
@@ -81,7 +93,6 @@ export default function EtlManagementScreen() {
                             position: 'relative',
                             boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
                         }}>
-                            {/* Botón cerrar */}
                             <Pressable
                                 onPress={() => setModalVisible(false)}
                                 style={{
@@ -99,7 +110,6 @@ export default function EtlManagementScreen() {
                                 <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#000' }}>✕</Text>
                             </Pressable>
 
-                            {/* Título */}
                             <Text style={{
                                 fontSize: 28,
                                 fontWeight: 'bold',
@@ -110,7 +120,6 @@ export default function EtlManagementScreen() {
                                 Crea un ETL
                             </Text>
 
-                            {/* Inputs */}
                             <Text style={{ fontWeight: '600', marginBottom: 4, color: isDark ? '#fff' : '#000' }}>Nombre del ETL</Text>
                             <input
                                 type="text"
@@ -155,15 +164,14 @@ export default function EtlManagementScreen() {
                                 <option>Procesamiento</option>
                             </select>
 
-                            {/* Botón guardar */}
                             <Pressable
                                 onPress={() => {
-                                    setIsLoading(true)
+                                    setIsLoading(true);
                                     setTimeout(() => {
-                                        setIsLoading(false)
-                                        alert('ETL guardado')
-                                        setModalVisible(false)
-                                    }, 2000)
+                                        setIsLoading(false);
+                                        alert('ETL guardado');
+                                        setModalVisible(false);
+                                    }, 2000);
                                 }}
                                 style={{
                                     backgroundColor: '#555',
@@ -186,10 +194,8 @@ export default function EtlManagementScreen() {
                 )
             }
         >
-            {/* Título y Subititulo */}
             <Text style={[styles.title, isDark && styles.titleDark]}>Gestión de ETLs</Text>
 
-            {/* Botón de Agregar */}
             <Pressable
                 style={[styles.addBtn, isDark && styles.addBtnDark]}
                 onPress={() => setModalVisible(true)}
@@ -220,40 +226,15 @@ export default function EtlManagementScreen() {
                 />
             </View>
 
+            <ReusableTable
+                headers={headers}
+                data={currentRows}
+                isDark={isDark}
+                onSort={handleSort}
+                renderRow={(item) => [item.id, item.name, item.type, 'Editar']}
+            />
 
-            {/* Header de la tabla */}
-            <View style={[styles.tableHeader, isDark && styles.tableHeaderDark]}>
-                <Pressable onPress={toggleSort} style={{ flex: 1, alignItems: 'center' }}>
-                    <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>
-                        ID del ETL {isAscending ? '⬇️' : '⬆️'}
-                    </Text>
-                </Pressable>
-                <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>
-                    Nombre del ETL
-                </Text>
-                <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>
-                    Tipo
-                </Text>
-                <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>
-                    Detalle
-                </Text>
-            </View>
-
-            {/* Tabla con paginación */}
-            <ScrollView style={styles.table}>
-                {currentRows.map((item) => (
-                    <View key={item.id} style={[styles.tableRow, isDark && styles.tableRowDark]}>
-                        <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.id}</Text>
-                        <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.name}</Text>
-                        <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.type}</Text>
-                        <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>Editar</Text>
-                    </View>
-                ))}
-            </ScrollView>
-
-            {/* Paginación */}
             <View style={styles.pagination}>
-                {/* Botón anterior */}
                 <Pressable onPress={handlePrevious} disabled={currentPage === 0}>
                     <Text style={[
                         styles.pageBtn,
@@ -263,7 +244,6 @@ export default function EtlManagementScreen() {
                     </Text>
                 </Pressable>
 
-                {/* Información de rango y total */}
                 <Text style={styles.pageBtn}>
                     Mostrando {
                     filteredData.length > 0
@@ -272,7 +252,6 @@ export default function EtlManagementScreen() {
                 } de {filteredData.length} ETLs
                 </Text>
 
-                {/* Botón siguiente */}
                 <Pressable onPress={handleNext} disabled={currentPage >= totalPags - 1}>
                     <Text style={[
                         styles.pageBtn,
@@ -283,5 +262,5 @@ export default function EtlManagementScreen() {
                 </Pressable>
             </View>
         </PageLayout>
-    )
+    );
 }

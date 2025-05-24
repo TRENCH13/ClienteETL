@@ -1,6 +1,7 @@
-import {Pressable, ScrollView, Text, View} from "react-native";
+import {Pressable, Text, View} from "react-native";
 import {styles} from "./AccessManagementStyles.ts";
 import PageLayout from "../../components/PageLayout.tsx";
+import ReusableTable from "../../components/Table.tsx";
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {useTheme} from "../../context/ThemeContext.tsx";
@@ -29,6 +30,10 @@ export default function AccessManagementScreen() {
         { name: 'Luisito Rey', role: 'Consultor', etlAccess: 6 },
     ]);
 
+    const handleSort = (key: string) => {
+        if (key === 'etlAccess') toggleSort();
+    };
+
     const toggleSort = () => {
         const sorted = [...sortedData].sort((a, b) => {
             if (isAscending) {
@@ -47,7 +52,7 @@ export default function AccessManagementScreen() {
         item.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.etlAccess.toString().includes(searchQuery)
     );
-    const totalPagis = Math.ceil(filteredData.length / rowsPerPage);
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
     const startIndex = currentPage * rowsPerPage;
     const currentRows = filteredData.slice(startIndex, startIndex + rowsPerPage);
 
@@ -56,16 +61,20 @@ export default function AccessManagementScreen() {
     }
 
     const handleNext = () => {
-        if (currentPage < totalPagis - 1) setCurrentPage(currentPage + 1)
+        if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1)
     }
+
+    const headers = [
+        { key: 'name', label: 'Nombre del Usuario' },
+        { key: 'role', label: 'Rol' },
+        { key: 'etlAccess', label: 'No. de Accesos a ETLs', sortable: true, ascending: isAscending }
+    ];
 
 
     return (
         <PageLayout>
-            {/* Título y Subititulo */}
             <Text style={[styles.title, isDark && styles.titleDark]}>Gestión de Permisos</Text>
 
-            {/* Buscador y botón */}
             <View style={styles.searchContainer}>
                 <View style={{ alignItems: 'center', marginBottom: 20 }}>
                     <Text style={{ fontWeight: 'bold', fontSize: 16, color: isDark ? '#fff' : '#000' }}>
@@ -92,42 +101,21 @@ export default function AccessManagementScreen() {
 
                 <Pressable
                     style={[styles.addBtn, isDark && styles.addBtnDark]}
-                    onPress={() =>  navigate('/accessmanage/newuser')}
+                    onPress={() => navigate('/accessmanage/newuser')}
                 >
                     <Text style={[styles.addBtnTxt, isDark && styles.addBtnDark]}>Agregar Usuario</Text>
                 </Pressable>
-
             </View>
 
-            {/* Header de la tabla */}
-            <View style={[styles.tableHeader, isDark && styles.tableHeaderDark]}>
-                <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>
-                    Nombre del Usuario
-                </Text>
-                <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>
-                    Rol
-                </Text>
-                <Pressable onPress={toggleSort} style={{ flex: 1, alignItems: 'center' }}>
-                    <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>
-                        No. de Accesos a ETLs {isAscending ? '⬇️' : '⬆️'}
-                    </Text>
-                </Pressable>
-            </View>
+            <ReusableTable
+                headers={headers}
+                data={currentRows}
+                isDark={isDark}
+                onSort={handleSort}
+                renderRow={(item) => [item.name, item.role, item.etlAccess]}
+            />
 
-            {/* Tabla con paginación */}
-            <ScrollView style={styles.table}>
-                {currentRows.map((item, index) => (
-                    <View key={index} style={[styles.tableRow, isDark && styles.tableRowDark]}>
-                        <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.name}</Text>
-                        <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.role}</Text>
-                        <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.etlAccess}</Text>
-                    </View>
-                ))}
-            </ScrollView>
-
-            {/* Paginación */}
             <View style={styles.pagination}>
-                {/* Botón anterior */}
                 <Pressable onPress={handlePrevious} disabled={currentPage === 0}>
                     <Text style={[
                         styles.pageBtn,
@@ -137,7 +125,6 @@ export default function AccessManagementScreen() {
                     </Text>
                 </Pressable>
 
-                {/* Información de rango y total */}
                 <Text style={styles.pageBtn}>
                     Mostrando {
                     filteredData.length > 0
@@ -146,17 +133,15 @@ export default function AccessManagementScreen() {
                 } de {filteredData.length} Usuarios
                 </Text>
 
-                {/* Botón siguiente */}
-                <Pressable onPress={handleNext} disabled={currentPage >= totalPagis - 1}>
+                <Pressable onPress={handleNext} disabled={currentPage >= totalPages - 1}>
                     <Text style={[
                         styles.pageBtn,
-                        currentPage >= totalPagis - 1 && { opacity: 0.4 }
+                        currentPage >= totalPages - 1 && { opacity: 0.4 }
                     ]}>
                         Siguiente
                     </Text>
                 </Pressable>
             </View>
         </PageLayout>
-
-    )
+    );
 }

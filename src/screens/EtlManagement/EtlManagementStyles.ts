@@ -55,7 +55,7 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#000',
         marginBottom: 4,
-        marginTop: 30,
+        marginTop: 10,
     },
     table: {
         marginVertical: 10,
@@ -155,8 +155,6 @@ export const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         color: '#fff',
-        marginBottom: 4,
-        marginTop: 30,
     },
     subtitleDark: {
         fontSize: 32,
