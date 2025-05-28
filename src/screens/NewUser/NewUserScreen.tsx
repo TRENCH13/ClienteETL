@@ -2,6 +2,7 @@ import {
     View,
     Text,
     TextInput,
+    Button,
 } from 'react-native'
 import {styles} from "../AccessManagement/AccessManagementStyles.ts";
 import ETLAccessCard from "../../components/EtlAccessCard.tsx";
@@ -17,7 +18,7 @@ export default function NewUserScreen() {
     const [searchETLQuery, setSearchETLQuery] = useState('');
     const [etlStates, setEtlStates] = useState<{ id: string, name: string, enabled: boolean }[]>([]);
     const [allEnabled, setAllEnabled] = useState(false);
-
+    const [userName, setUserName] = useState('');
 
     useEffect(() => {
         setEtlStates([
@@ -50,13 +51,35 @@ export default function NewUserScreen() {
         )
     }
 
-    const enabledETLs = etlStates.filter(e => e.enabled)
+    const handleSave = async () => {
+        try {
+            // Simula el guardado (reemplaza por lógica real)
+            if (userName.trim() === "") {
+                alert('El nombre de usuario no puede estar vacío.');
+                return;
+            }
+
+            const selectedETLs = etlStates.filter(e => e.enabled).map(e => e.id);
+
+            // Simulación de guardado:
+            console.log("Guardando usuario:", userName);
+            console.log("ETLs seleccionados:", selectedETLs);
+
+            // await fetch(...);
+
+            alert('Usuario ${userName} correctamente.');
+        } catch (error) {
+            console.log(error);
+            alert('No se pudo guardar el usuario.');
+        }
+    };
+
+    const enabledETLs = etlStates.filter(e => e.enabled);
     const availableETLs = etlStates.filter(e =>
         !e.enabled &&
         (e.id.includes(searchETLQuery.trim()) ||
             e.name.toLowerCase().includes(searchETLQuery.trim().toLowerCase()))
-    )
-
+    );
 
     return(
         <PageLayout>
@@ -68,8 +91,9 @@ export default function NewUserScreen() {
             {/* Input de nombre de nuevo usuario */}
             <View style={{ alignItems: 'center', marginTop: 40 }}>
                 <TextInput
-                    placeholder="Buscar..."
-                    onChangeText={(text) => console.log('Valor del input:', text)}
+                    placeholder="Nombre del usuario"
+                    onChangeText={setUserName}
+                    value={userName}
                     placeholderTextColor={isDark ? '#aaa' : '#888'}
                     style={{
                         textAlign: 'center',
@@ -84,9 +108,7 @@ export default function NewUserScreen() {
                         backgroundColor: isDark ? '#2C2C2C' : '#fff',
                     }}
                 />
-
             </View>
-
 
             {/* ETLs activados */}
             <Text style={[styles.subtitle, isDark && styles.subtitleDark]}>
@@ -139,13 +161,12 @@ export default function NewUserScreen() {
                 onChangeText={setSearchETLQuery}
             />
 
-
             <View style={{
                 flexDirection: 'row',
                 flexWrap: 'wrap',
                 justifyContent: 'center',
                 marginTop: 20,
-                marginBottom: 60
+                marginBottom: 30
             }}>
                 {availableETLs.map(etl => (
                     <ETLAccessCard
@@ -156,6 +177,11 @@ export default function NewUserScreen() {
                         onToggle={handleToggleETL}
                     />
                 ))}
+            </View>
+
+            {/* Botón para guardar */}
+            <View style={{ alignItems: 'center', marginBottom: 40 }}>
+                <Button title="Guardar usuario" onPress={handleSave} color={isDark ? "#4CAF50" : "#1976D2"} />
             </View>
         </PageLayout>
     )
