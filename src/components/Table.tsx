@@ -15,6 +15,7 @@ type ReusableTableProps<T> = {
     isDark?: boolean;
     onSort?: (key: string) => void;
     renderRow: (item: T) => (string | number | React.ReactNode)[];
+    onRowClick?: (item: T) => void; // NUEVO
 };
 
 export default function ReusableTable<T>({
@@ -23,6 +24,7 @@ export default function ReusableTable<T>({
                                              isDark = false,
                                              onSort,
                                              renderRow,
+                                             onRowClick,
                                          }: ReusableTableProps<T>) {
     return (
         <>
@@ -46,8 +48,9 @@ export default function ReusableTable<T>({
                 {data.map((item, index) => {
                     const row = renderRow(item);
                     return (
-                        <View
+                        <Pressable
                             key={index}
+                            onPress={() => onRowClick?.(item)}
                             style={{
                                 flexDirection: 'row',
                                 padding: 10,
@@ -64,7 +67,7 @@ export default function ReusableTable<T>({
                                     {cell}
                                 </Text>
                             ))}
-                        </View>
+                        </Pressable>
                     );
                 })}
             </ScrollView>

@@ -10,14 +10,21 @@ import PageLayout from "../../components/PageLayout.tsx";
 import BackButton from "../../components/BackButton.tsx";
 import SearchBar from "../../components/SearchBar.tsx";
 import {useState, useEffect} from "react";
+import { useLocation } from "react-router-dom";
 
-export default function NewUserScreen() {
+export default function EditUserScreen() {
     const { theme } = useTheme()
     const isDark = theme === 'dark'
+    const location = useLocation();
+
+    const searchParams = new URLSearchParams(location.search);
+    const userId = searchParams.get('id') || '';
+    const userNameParam = searchParams.get('name') || '';
+
+    const userName = decodeURIComponent(userNameParam);
     const [searchETLQuery, setSearchETLQuery] = useState('');
     const [etlStates, setEtlStates] = useState<{ id: string, name: string, enabled: boolean }[]>([]);
     const [allEnabled, setAllEnabled] = useState(false);
-    const [userName, setUserName] = useState('');
 
     useEffect(() => {
         setEtlStates([
@@ -35,12 +42,12 @@ export default function NewUserScreen() {
             { id: '051', name: 'ETL Financiera', enabled: false },
             { id: '052', name: 'ETL Financiera', enabled: false },
             { id: '053', name: 'ETL Financiera', enabled: false },
-        ])
-    }, [])
+        ]);
+    }, [userId]);
 
     useEffect(() => {
-        const everyEnabled = etlStates.length > 0 && etlStates.every(etl => etl.enabled);
-        setAllEnabled(everyEnabled);
+        const allEnabled = etlStates.length > 0 && etlStates.every(etl => etl.enabled);
+        setAllEnabled(allEnabled);
     }, [etlStates]);
 
     const toggleAllETLs = () => {
@@ -58,21 +65,18 @@ export default function NewUserScreen() {
 
     const handleSave = async () => {
         try {
-            // Simula el guardado (reemplaza por lógica real)
             if (userName.trim() === "") {
                 alert('El nombre de usuario no puede estar vacío.');
                 return;
             }
 
             const selectedETLs = etlStates.filter(e => e.enabled).map(e => e.id);
-
-            // Simulación de guardado:
             console.log("Guardando usuario:", userName);
             console.log("ETLs seleccionados:", selectedETLs);
 
             // await fetch(...);
 
-            alert(`Usuario ${userName} ha obtenido permisos de ${selectedETLs} correctamente.`);
+            alert(`Permisos de ${userName} actualizados correctamente.`);
         } catch (error) {
             console.log(error);
             alert('No se pudo guardar el usuario.');
@@ -86,20 +90,18 @@ export default function NewUserScreen() {
             e.name.toLowerCase().includes(searchETLQuery.trim().toLowerCase()))
     );
 
-    return(
+    return (
         <PageLayout>
             <BackButton />
+
             <Text style={[styles.title, isDark && styles.titleDark]}>
-                Crea un Nuevo Usuario
+                Gestión de Permisos de {userName}
             </Text>
 
-            {/* Input de nombre de nuevo usuario */}
             <View style={{ alignItems: 'center', marginTop: 40 }}>
                 <TextInput
-                    placeholder="Nombre del usuario"
-                    onChangeText={setUserName}
                     value={userName}
-                    placeholderTextColor={isDark ? '#aaa' : '#888'}
+                    editable={false} // Puedes cambiar esto a true si quieres que se edite
                     style={{
                         textAlign: 'center',
                         paddingVertical: 10,
@@ -115,7 +117,6 @@ export default function NewUserScreen() {
                 />
             </View>
 
-            {/* ETLs activados */}
             <Text style={[styles.subtitle, isDark && styles.subtitleDark]}>
                 Va a tener acceso a estos ETL:
             </Text>
@@ -137,23 +138,22 @@ export default function NewUserScreen() {
                 </Text>
             </View>
 
-            {/* Botón para guardar */}
             <View style={{ alignItems: 'center', marginBottom: 20, marginTop: 20}}>
                 <Text
-                     onPress={handleSave}
-                     style={{
-                         paddingVertical: 8,
-                         paddingHorizontal: 16,
-                         borderRadius: 12,
-                         backgroundColor: isDark ? '#333' : '#555',
-                         color:'#fff',
-                         fontSize: 14,
-                         textAlign: 'center',
-                         alignSelf: 'center',
-                     }}
-                 >
-                    Guardar Usuario
-                 </Text>
+                    onPress={handleSave}
+                    style={{
+                        paddingVertical: 8,
+                        paddingHorizontal: 16,
+                        borderRadius: 12,
+                        backgroundColor: isDark ? '#333' : '#555',
+                        color:'#fff',
+                        fontSize: 14,
+                        textAlign: 'center',
+                        alignSelf: 'center',
+                    }}
+                >
+                    Guardar Cambios
+                </Text>
             </View>
 
             <View style={{
@@ -173,12 +173,10 @@ export default function NewUserScreen() {
                 ))}
             </View>
 
-            {/* ETLs disponibles */}
             <Text style={[styles.subtitle, isDark && styles.subtitleDark, { marginTop: 40 }]}>
                 ETL Disponibles:
             </Text>
 
-            {/* Buscador de ETLs disponibles */}
             <SearchBar
                 placeholder="Busca un ETL por ID o por nombre"
                 value={searchETLQuery}

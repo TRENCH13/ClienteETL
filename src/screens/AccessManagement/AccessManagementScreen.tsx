@@ -18,17 +18,18 @@ export default function AccessManagementScreen() {
     const rowsPerPage = 5
 
     const [sortedData, setSortedData] = useState([
-        { name: 'Cristiano Ronaldo', role: 'Administrador', etlAccess: 20 },
-        { name: 'Taylor Swift', role: 'Consultor', etlAccess: 13 },
-        { name: 'Tom Brady', role: 'Consultor', etlAccess: 2 },
-        { name: 'Guillermo del Toro', role: 'Consultor', etlAccess: 1 },
-        { name: 'Gabriel Montiel', role: 'Consultor', etlAccess: 6 },
-        { name: 'Stephen Curry', role: 'Administrador', etlAccess: 50 },
-        { name: 'Ariana Grande', role: 'Consultor', etlAccess: 13 },
-        { name: 'Michael Jordan', role: 'Consultor', etlAccess: 2 },
-        { name: 'Sabrina Carpenter', role: 'Consultor', etlAccess: 1 },
-        { name: 'Luisito Rey', role: 'Consultor', etlAccess: 6 },
+        { id: '001', name: 'Cristiano Ronaldo', role: 'Administrador', etlAccess: 20 },
+        { id: '002', name: 'Taylor Swift', role: 'Consultor', etlAccess: 13 },
+        { id: '003', name: 'Tom Brady', role: 'Consultor', etlAccess: 2 },
+        { id: '004', name: 'Guillermo del Toro', role: 'Consultor', etlAccess: 1 },
+        { id: '005', name: 'Gabriel Montiel', role: 'Consultor', etlAccess: 6 },
+        { id: '006', name: 'Stephen Curry', role: 'Administrador', etlAccess: 50 },
+        { id: '007', name: 'Ariana Grande', role: 'Consultor', etlAccess: 13 },
+        { id: '008', name: 'Michael Jordan', role: 'Consultor', etlAccess: 2 },
+        { id: '009', name: 'Sabrina Carpenter', role: 'Consultor', etlAccess: 1 },
+        { id: '010', name: 'Luisito Rey', role: 'Consultor', etlAccess: 6 },
     ]);
+
 
     const handleSort = (key: string) => {
         if (key === 'etlAccess') toggleSort();
@@ -113,6 +114,9 @@ export default function AccessManagementScreen() {
                 isDark={isDark}
                 onSort={handleSort}
                 renderRow={(item) => [item.name, item.role, item.etlAccess]}
+                onRowClick={(item) =>
+                    navigate(`/accessmanage/edituser?id=${item.id}&name=${encodeURIComponent(item.name)}`)
+                }
             />
 
             <View style={styles.pagination}>
