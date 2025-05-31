@@ -29,14 +29,23 @@ export default function ReusableTable<T>({
     return (
         <>
             {/* Header */}
-            <View style={{ flexDirection: 'row', backgroundColor: isDark ? '#1e1e1e' : '#F1F9F5', padding: 10 }}>
+            <View style={{ flexDirection: 'row', backgroundColor: isDark ? '#1e1e1e' : '#F1F9F5', paddingVertical: 10, paddingHorizontal: 10, width: '100%' }}>
                 {headers.map((header: HeaderType, idx: number) => (
                     <Pressable
                         key={idx}
-                        style={{ flex: 1, alignItems: 'center' }}
                         onPress={() => onSort?.(header.key)}
+                        style={{
+                            flex: 1,
+                            paddingHorizontal: 12,
+                            alignItems: 'center',
+                        }}
                     >
-                        <Text style={{ fontWeight: 'bold', color: isDark ? '#fff' : '#000' }}>
+                        <Text style={{
+                            fontWeight: 'bold',
+                            color: isDark ? '#fff' : '#000',
+                            textAlign: 'center',
+                            fontSize: 14,
+                        }}>
                             {header.label} {header.sortable ? (header.ascending ? '⬇️' : '⬆️') : ''}
                         </Text>
                     </Pressable>
@@ -44,7 +53,9 @@ export default function ReusableTable<T>({
             </View>
 
             {/* Data Rows */}
-            <ScrollView>
+            <ScrollView
+                style={{ width: '100%' }}
+            >
                 {data.map((item, index) => {
                     const row = renderRow(item);
                     return (
@@ -53,19 +64,34 @@ export default function ReusableTable<T>({
                             onPress={() => onRowClick?.(item)}
                             style={{
                                 flexDirection: 'row',
-                                padding: 10,
+                                paddingVertical: 10,
+                                paddingHorizontal: 10,
                                 backgroundColor: isDark ? '#111' : '#fff',
                                 borderBottomWidth: 1,
                                 borderBottomColor: '#ccc',
                             }}
                         >
                             {row.map((cell, i) => (
-                                <Text
+                                <View
                                     key={i}
-                                    style={{ flex: 1, color: isDark ? '#fff' : '#000', textAlign: 'center' }}
+                                    style={{
+                                        flex: 1,
+                                        marginHorizontal: 5,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                    }}
                                 >
-                                    {cell}
-                                </Text>
+                                    <Text
+                                        style={{
+                                            color: isDark ? '#fff' : '#000',
+                                            fontSize: 14,
+                                            textAlign: 'center',
+                                            flexWrap: 'wrap',
+                                        }}
+                                    >
+                                        {cell}
+                                    </Text>
+                                </View>
                             ))}
                         </Pressable>
                     );

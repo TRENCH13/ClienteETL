@@ -27,7 +27,11 @@ interface AxiosErrorWithResponse {
 
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
     try {
-        const response = await api.post<LoginResponse>('/auth/login', data);
+        const response = await api.post<LoginResponse>('/auth/login', data, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
         return response.data;
     } catch (error: unknown) {
         if (

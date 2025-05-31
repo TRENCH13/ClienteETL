@@ -149,4 +149,70 @@ export const styles = StyleSheet.create({
         marginTop: 20,
         color: '#fff',
     },
+    criticalBtnCircle: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        top: 135,
+        right: 140,
+        zIndex: 10
+    },
+    criticalRed: {
+        backgroundColor: 'red',
+    },
+    criticalGray: {
+        backgroundColor: 'gray',
+    },
+    criticalBtnText: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    modalOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 9999,
+    },
+
+    modalContent: {
+        backgroundColor: 'white',
+        paddingVertical: 30,
+        paddingHorizontal: 25,
+        borderRadius: 12,
+        alignItems: 'center',
+        width: '95%',
+        maxWidth: 700,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 12,
+        color: 'red',
+        textAlign: 'center'
+    },
+    modalText: {
+        fontSize: 16,
+        marginBottom: 20,
+        textAlign: 'center',
+        color: '#333',
+    },
+    closeButton: {
+        backgroundColor: '#555',
+        paddingVertical: 10,
+        paddingHorizontal: 25,
+        borderRadius: 6,
+        marginTop: 20
+    },
+    closeButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
+    }
+
+
 })

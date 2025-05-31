@@ -26,6 +26,8 @@ export default function LoginScreen() {
             const response = await login({ nombreUsuario: username });
             console.log(response.usuario.nombre);
             localStorage.setItem("user", JSON.stringify(response.usuario));
+            localStorage.setItem("token", response.token);
+            console.log(response.usuario);
             navigate('/morning');
         } catch (err: unknown) {
             if (
