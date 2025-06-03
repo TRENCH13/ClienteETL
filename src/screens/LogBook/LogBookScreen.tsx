@@ -2,12 +2,13 @@ import { Text, View } from "react-native";
 import { useState, useEffect } from "react";
 import PageLayout from "../../components/PageLayout.tsx";
 import ReusableTable from "../../components/Table.tsx";
+import { getReportesPorFecha, Reporte } from "../../services/ReporteService.ts";
 import { styles } from "./LogBookStyles.ts";
 import { useTheme } from "../../context/ThemeContext.tsx";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { es } from 'date-fns/locale';
-import CustomDateInput from "../../components/CustomDateInput";
 import { format } from "date-fns";
 
 type ETLReport = {
@@ -33,34 +34,39 @@ export default function LogBookScreen() {
     ];
 
     useEffect(() => {
-        if (!selectedDate) return;
+        const fetchData = async () => {
+            if (!selectedDate) return;
 
-        const formatted = format(selectedDate, "yyyy-MM-dd");
-        console.log("Buscando ETLs para:", formatted);
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error("Token no encontrado");
+                return;
+            }
 
-        const mockData: Record<string, ETLReport[]> = {
-            "2025-04-05": [
-                { id: "013", name: "ETL CargaVentas", type: "Procesamiento", detail: "Carga de ventas diarias" },
-                { id: "027", name: "ETL AlertasStock", type: "Alerta", detail: "Stock bajo en inventario" }
-            ],
-            "2025-04-06": [
-                { id: "030", name: "ETL CierreCaja", type: "Archivo", detail: "Exportación diaria de caja" },
-                { id: "041", name: "ETL KPI Producción", type: "Archivo", detail: "Indicadores de producción" }
-            ],
-            "2025-04-07": [
-                { id: "030", name: "ETL CierreCaja", type: "Archivo", detail: "Exportación diaria de caja" },
-                { id: "041", name: "ETL KPI Producción", type: "Archivo", detail: "Indicadores de producción" }
-            ]
+            const formatted = format(selectedDate, "yyyy-MM-dd");
+            console.log("Buscando reportes reales para:", formatted);
+
+            setIsLoading(true);
+            try {
+                const data = await getReportesPorFecha(formatted, token);
+                const parsed: ETLReport[] = data.map((reporte: Reporte) => ({
+                    id: String(reporte.etl.idEtl),
+                    name: reporte.etl.nombreEtl,
+                    type: reporte.etl.tipoEtl,
+                    detail: reporte.statusReporte
+                }));
+                setEtlList(parsed);
+            } catch (error) {
+                console.error("Error al cargar reportes por fecha:", error);
+                setEtlList([]);
+            } finally {
+                setIsLoading(false);
+            }
         };
 
-        setIsLoading(true);
-        setEtlList([]);
-
-        setTimeout(() => {
-            setEtlList(mockData[formatted] || []);
-            setIsLoading(false);
-        }, 800);
+        fetchData();
     }, [selectedDate]);
+
 
     return (
         <PageLayout>
@@ -72,15 +78,24 @@ export default function LogBookScreen() {
                 <Text style={[styles.subtitle, isDark && styles.subtitleDark]}>
                     Selecciona una fecha
                 </Text>
-
-                <DatePicker
-                    selected={selectedDate}
-                    onChange={(date) => setSelectedDate(date)}
-                    locale={es}
-                    dateFormat="dd-MMM-yyyy"
-                    customInput={<CustomDateInput />}
-                    popperPlacement="bottom-start"
-                />
+                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
+                    <DatePicker
+                        label="Selecciona una fecha"
+                        value={selectedDate}
+                        onChange={(newValue) => setSelectedDate(newValue)}
+                        slotProps={{
+                            textField: {
+                                variant: 'outlined',
+                                style: {
+                                    marginTop: 20,
+                                    width: 250,
+                                    backgroundColor: 'white',
+                                    borderRadius: 8,
+                                },
+                            },
+                        }}
+                    />
+                </LocalizationProvider>
             </View>
 
             <View style={{ marginTop: 30, paddingHorizontal: 20 }}>

@@ -40,3 +40,16 @@ export const acusarReporte = async (idReporte: number, token: string): Promise<a
     });
     return response.data;
 };
+
+export const getReportesPorFecha = async (fecha: string, token: string): Promise<Reporte[]> => {
+    const response = await api.get('/reportes/por-fecha', {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        params: {
+            fecha
+        }
+    });
+    return response.data;
+};
