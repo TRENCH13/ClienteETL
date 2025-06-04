@@ -2,7 +2,6 @@ import {
     View,
     Text,
     Pressable,
-    ScrollView,
 } from 'react-native';
 import { useEffect, useState } from "react";
 import { styles } from './MorningReportStyles';
@@ -16,18 +15,29 @@ import {
 } from "../../services/ReporteService.ts";
 import ReusableTable from "../../components/Table.tsx";
 
+type FlatReporte = {
+    id: string;
+    name: string;
+    type: string;
+    detail: string;
+};
+
 export default function MorningReportScreen() {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
 
-    const [isAscending, setIsAscending] = useState(true);
-    const [currentPage, setCurrentPage] = useState(0);
-    const rowsPerPage = 5;
 
-    const [sortedData, setSortedData] = useState<Reporte[]>([]);
     const [reportesCriticos, setReportesCriticos] = useState<Reporte[]>([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [seleccionados, setSeleccionados] = useState<number[]>([]);
+    const [etlList, setEtlList] = useState<FlatReporte[]>([]);
+
+    const etlHeaders = [
+        { key: 'id', label: 'ID del Reporte' },
+        { key: 'name', label: 'Nombre del ETL' },
+        { key: 'type', label: 'Tipo' },
+        { key: 'detail', label: 'Detalle' }
+    ];
 
     useEffect(() => {
         cargarReportes();
@@ -43,7 +53,14 @@ export default function MorningReportScreen() {
                 getReportesCriticosNoAcusados(token)
             ]);
 
-            setSortedData(reportesHoy);
+            const planos: FlatReporte[] = reportesHoy.map(r => ({
+                id: String(r.idReporte),
+                name: r.etl.nombreEtl,
+                type: r.etl.tipoEtl,
+                detail: r.statusReporte,
+            }));
+
+            setEtlList(planos);
             setReportesCriticos(criticos);
         } catch (err) {
             console.error('Error al cargar reportes:', err);
@@ -87,28 +104,6 @@ export default function MorningReportScreen() {
         await cargarReportes(); // refresca datos visualmente
     };
 
-    const toggleSort = () => {
-        const sorted = [...sortedData].sort((a, b) => {
-            const idA = a.idReporte;
-            const idB = b.idReporte;
-            return isAscending ? idA - idB : idB - idA;
-        });
-        setSortedData(sorted);
-        setIsAscending(!isAscending);
-        setCurrentPage(0);
-    };
-
-    const totalPages = Math.ceil(sortedData.length / rowsPerPage);
-    const startIndex = currentPage * rowsPerPage;
-    const currentRows = sortedData.slice(startIndex, startIndex + rowsPerPage);
-
-    const handlePrevious = () => {
-        if (currentPage > 0) setCurrentPage(currentPage - 1);
-    };
-
-    const handleNext = () => {
-        if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1);
-    };
 
     return (
         <>
@@ -130,42 +125,17 @@ export default function MorningReportScreen() {
                     <Text style={styles.criticalBtnText}>⚠️</Text>
                 </Pressable>
 
-                <View style={[styles.tableHeader, isDark && styles.tableHeaderDark]}>
-                    <Pressable onPress={toggleSort} style={{ flex: 1, alignItems: 'center' }}>
-                        <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>
-                            ID {isAscending ? '⬇️' : '⬆️'}
-                        </Text>
-                    </Pressable>
-                    <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>
-                        Nombre del ETL
+                <View style={{ marginTop: 30, paddingHorizontal: 20 }}>
+                    <Text style={[styles.subtitle, isDark && styles.subtitleDark]}>
+                        Reportes del día:
                     </Text>
-                    <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>
-                        Tipo
-                    </Text>
-                    <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>
-                        Detalle
-                    </Text>
-                </View>
 
-                <ScrollView style={styles.table}>
-                    {currentRows.map((item) => (
-                        <View key={item.idReporte} style={[styles.tableRow, isDark && styles.tableRowDark]}>
-                            <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.idReporte}</Text>
-                            <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.etl.nombreEtl}</Text>
-                            <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.etl.tipoEtl}</Text>
-                            <Text style={[styles.tableCell, isDark && styles.tableCellDark]}>{item.statusReporte}</Text>
-                        </View>
-                    ))}
-                </ScrollView>
-
-                <View style={styles.pagination}>
-                    <Pressable onPress={handlePrevious} disabled={currentPage === 0}>
-                        <Text style={[styles.pageBtn, currentPage === 0 && { opacity: 0.4 }]}>Anterior</Text>
-                    </Pressable>
-                    <Text style={styles.pageBtn}>Página {currentPage + 1} / {totalPages}</Text>
-                    <Pressable onPress={handleNext} disabled={currentPage === totalPages - 1}>
-                        <Text style={[styles.pageBtn, currentPage === totalPages - 1 && { opacity: 0.4 }]}>Siguiente</Text>
-                    </Pressable>
+                    <ReusableTable
+                        headers={etlHeaders}
+                        data={etlList}
+                        isDark={isDark}
+                        renderRow={(item) => [item.id, item.name, item.type, item.detail]}
+                    />
                 </View>
             </PageLayout>
 
