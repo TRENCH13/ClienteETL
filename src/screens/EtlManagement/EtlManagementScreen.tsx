@@ -2,8 +2,10 @@ import {ActivityIndicator, Pressable, Text, View} from "react-native";
 import {styles} from "./EtlManagementStyles.ts";
 import PageLayout from "../../components/PageLayout.tsx";
 import ReusableTable from "../../components/Table.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useTheme} from "../../context/ThemeContext.tsx";
+import { getTodosLosEtls, Etl, crearEtl, eliminarEtl, actualizarEtl } from "../../services/EtlService.ts";
+
 
 export default function EtlManagementScreen() {
     const { theme } = useTheme()
@@ -14,26 +16,43 @@ export default function EtlManagementScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [modalVisible, setModalVisible] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [sortedData, setSortedData] = useState<{ id: string; name: string; type: string; detail: string }[]>([]);
+    const [etlSeleccionado, setEtlSeleccionado] = useState<Etl | null>(null);
+    //DATOS DEL MODAL
+    const [nuevoNombre, setNuevoNombre] = useState('');
+    const [nuevoTipo, setNuevoTipo] = useState('Archivo');
+    const [nuevaDescripcion, setNuevaDescripcion] = useState('');
 
     const rowsPerPage = 5
 
-    const [sortedData, setSortedData] = useState([
-        { id: '013', name: 'Lorem ipsum dolor sit amet', type: 'Procesamiento' },
-        { id: '027', name: 'Lorem ipsum dolor sit amet', type: 'Alerta' },
-        { id: '030', name: 'Lorem ipsum dolor sit amet', type: 'Archivo' },
-        { id: '037', name: 'Lorem ipsum dolor sit amet', type: 'Archivo' },
-        { id: '041', name: 'Lorem ipsum dolor sit amet', type: 'Archivo' },
-        { id: '130', name: 'Lorem ipsum dolor sit amet', type: 'Archivo' },
-        { id: '137', name: 'Lorem ipsum dolor sit amet', type: 'Archivo' },
-        { id: '141', name: 'Lorem ipsum dolor sit amet', type: 'Archivo' },
-    ]);
 
     const headers = [
         { key: 'id', label: 'ID del ETL', sortable: true, ascending: isAscending },
         { key: 'name', label: 'Nombre del ETL' },
         { key: 'type', label: 'Tipo' },
-        { key: 'detail', label: 'Detalle' }
     ];
+
+    useEffect(() => {
+        const fetchEtls = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const etls = await getTodosLosEtls(token);
+                const parsed = etls.map((etl: Etl) => ({
+                    id: String(etl.id),
+                    name: etl.nombre,
+                    type: etl.tipo,
+                    detail: etl.descripcion
+                }));
+                setSortedData(parsed);
+            } catch (error) {
+                console.error("Error al cargar ETLs:", error);
+            }
+        };
+
+        fetchEtls();
+    }, []);
 
     const toggleSort = () => {
         const sorted = [...sortedData].sort((a, b) => {
@@ -117,13 +136,15 @@ export default function EtlManagementScreen() {
                                 marginBottom: 30,
                                 color: isDark ? '#fff' : '#000'
                             }}>
-                                Crea un ETL
+                                {etlSeleccionado ? 'Editar ETL' : 'Crear un ETL'}
                             </Text>
 
                             <Text style={{ fontWeight: '600', marginBottom: 4, color: isDark ? '#fff' : '#000' }}>Nombre del ETL</Text>
                             <input
                                 type="text"
                                 placeholder="ETL Crítico"
+                                value={nuevoNombre}
+                                onChange={(e) => setNuevoNombre(e.target.value)}
                                 style={{
                                     padding: 10,
                                     borderRadius: 6,
@@ -138,6 +159,8 @@ export default function EtlManagementScreen() {
                             <input
                                 type="text"
                                 placeholder="Este es un ETL de carácter crítico"
+                                value={nuevaDescripcion}
+                                onChange={(e) => setNuevaDescripcion(e.target.value)}
                                 style={{
                                     padding: 10,
                                     borderRadius: 6,
@@ -150,6 +173,8 @@ export default function EtlManagementScreen() {
 
                             <Text style={{ fontWeight: '600', marginBottom: 4, color: isDark ? '#fff' : '#000' }}>Tipo de ETL</Text>
                             <select
+                                value={nuevoTipo}
+                                onChange={(e) => setNuevoTipo(e.target.value)}
                                 style={{
                                     padding: 10,
                                     borderRadius: 6,
@@ -165,14 +190,49 @@ export default function EtlManagementScreen() {
                             </select>
 
                             <Pressable
-                                onPress={() => {
+                                onPress={async () => {
                                     setIsLoading(true);
-                                    setTimeout(() => {
-                                        setIsLoading(false);
-                                        alert('ETL guardado');
+                                    const token = localStorage.getItem('token');
+                                    if (!token) return;
+
+                                    const payload = {
+                                        nombre: nuevoNombre,
+                                        tipo: nuevoTipo,
+                                        descripcion: nuevaDescripcion,
+                                    };
+
+                                    try {
+                                        if (etlSeleccionado) {
+                                            const res = await actualizarEtl(etlSeleccionado.id, payload, token);
+                                            alert(`✅ ETL actualizado exitosamente (ID ${etlSeleccionado.id})`);
+                                            console.log(res);
+                                        } else {
+                                            const res = await crearEtl(payload, token);
+                                            alert(`✅ ETL creado exitosamente con ID ${res.id}`);
+                                        }
+
+                                        // Actualiza tabla y cierra modal
+                                        const etls = await getTodosLosEtls(token);
+                                        const parsed = etls.map((etl: Etl) => ({
+                                            id: String(etl.id),
+                                            name: etl.nombre,
+                                            type: etl.tipo,
+                                            detail: etl.descripcion
+                                        }));
+                                        setSortedData(parsed);
                                         setModalVisible(false);
-                                    }, 2000);
+                                        setEtlSeleccionado(null);
+                                        setNuevoNombre('');
+                                        setNuevoTipo('Archivo');
+                                        setNuevaDescripcion('');
+                                    } catch (error) {
+                                        alert('❌ Error al guardar el ETL.');
+                                        console.error(error);
+                                    } finally {
+                                        setIsLoading(false);
+                                    }
                                 }}
+
                                 style={{
                                     backgroundColor: '#555',
                                     paddingVertical: 12,
@@ -185,10 +245,57 @@ export default function EtlManagementScreen() {
                                     <ActivityIndicator size="small" color="#fff" />
                                 ) : (
                                     <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
-                                        Guardar ETL
+                                        {etlSeleccionado ? 'Guardar cambios' : 'Guardar ETL'}
                                     </Text>
                                 )}
                             </Pressable>
+
+                            {etlSeleccionado && (
+                                <Pressable
+                                    onPress={async () => {
+                                        if (!etlSeleccionado) return;
+
+                                        const confirmacion = confirm(`¿Estás seguro de eliminar el ETL ID ${etlSeleccionado.id}?`);
+                                        if (!confirmacion) return;
+
+                                        try {
+                                            const token = localStorage.getItem('token');
+                                            if (!token) throw new Error('Token no encontrado');
+
+                                            const res = await eliminarEtl(etlSeleccionado.id, token);
+                                            alert(`✅ ${res.mensaje}`);
+
+                                            // Actualiza tabla y cierra modal
+                                            const etls = await getTodosLosEtls(token);
+                                            const parsed = etls.map((etl: Etl) => ({
+                                                id: String(etl.id),
+                                                name: etl.nombre,
+                                                type: etl.tipo,
+                                                detail: etl.descripcion
+                                            }));
+                                            setSortedData(parsed);
+                                            setModalVisible(false);
+                                            setEtlSeleccionado(null);
+                                            setNuevoNombre('');
+                                            setNuevoTipo('Archivo');
+                                            setNuevaDescripcion('');
+                                        } catch (error) {
+                                            alert('❌ Error al eliminar el ETL');
+                                            console.error(error);
+                                        }
+                                    }}
+                                    style={{
+                                        backgroundColor: 'red',
+                                        paddingVertical: 10,
+                                        paddingHorizontal: 20,
+                                        borderRadius: 6,
+                                        alignSelf: 'center',
+                                        marginTop: 12
+                                    }}
+                                >
+                                    <Text style={{ color: '#fff', fontWeight: 'bold' }}>Eliminar ETL</Text>
+                                </Pressable>
+                            )}
                         </View>
                     </View>
                 )
@@ -231,7 +338,19 @@ export default function EtlManagementScreen() {
                 data={currentRows}
                 isDark={isDark}
                 onSort={handleSort}
-                renderRow={(item) => [item.id, item.name, item.type, 'Editar']}
+                renderRow={(item) => [item.id, item.name, item.type]}
+                onRowClick={(item) => {
+                    setEtlSeleccionado({
+                        id: Number(item.id),
+                        nombre: item.name,
+                        tipo: item.type,
+                        descripcion: item.detail,
+                    } as Etl );
+                    setNuevoNombre(item.name);
+                    setNuevoTipo(item.type);
+                    setNuevaDescripcion(item.detail);
+                    setModalVisible(true);
+                }}
             />
 
             <View style={styles.pagination}>
