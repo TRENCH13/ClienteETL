@@ -10,33 +10,43 @@ import PageLayout from "../../components/PageLayout.tsx";
 import BackButton from "../../components/BackButton.tsx";
 import SearchBar from "../../components/SearchBar.tsx";
 import {useState, useEffect} from "react";
+import { getTodosLosEtls } from "../../services/EtlService.ts";
+import { crearNuevoUsuario } from "../../services/UsuarioService.ts";
+import { useNavigate } from "react-router-dom";
+
 
 export default function NewUserScreen() {
     const { theme } = useTheme()
     const isDark = theme === 'dark'
+    const navigate = useNavigate();
+
+
     const [searchETLQuery, setSearchETLQuery] = useState('');
     const [etlStates, setEtlStates] = useState<{ id: string, name: string, enabled: boolean }[]>([]);
     const [allEnabled, setAllEnabled] = useState(false);
     const [userName, setUserName] = useState('');
 
     useEffect(() => {
-        setEtlStates([
-            { id: '001', name: 'ETL Ingresos', enabled: true },
-            { id: '013', name: 'ETL Ventas', enabled: true },
-            { id: '007', name: 'ETL Logística', enabled: false },
-            { id: '042', name: 'ETL Finanzas', enabled: false },
-            { id: '043', name: 'ETL Financiera', enabled: false },
-            { id: '044', name: 'ETL Financiera', enabled: false },
-            { id: '045', name: 'ETL Financiera', enabled: false },
-            { id: '046', name: 'ETL Financiera', enabled: false },
-            { id: '008', name: 'ETL Logística', enabled: false },
-            { id: '049', name: 'ETL Finanzas', enabled: false },
-            { id: '050', name: 'ETL Financiera', enabled: false },
-            { id: '051', name: 'ETL Financiera', enabled: false },
-            { id: '052', name: 'ETL Financiera', enabled: false },
-            { id: '053', name: 'ETL Financiera', enabled: false },
-        ])
-    }, [])
+        const cargarETLs = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const etls = await getTodosLosEtls(token);
+                const transformed = etls.map(etl => ({
+                    id: String(etl.id),
+                    name: etl.nombre,
+                    enabled: false
+                }));
+                setEtlStates(transformed);
+            } catch (error) {
+                console.error("Error al cargar los ETLs:", error);
+            }
+        };
+
+        void cargarETLs();
+    }, []);
+
 
     useEffect(() => {
         const everyEnabled = etlStates.length > 0 && etlStates.every(etl => etl.enabled);
@@ -58,26 +68,39 @@ export default function NewUserScreen() {
 
     const handleSave = async () => {
         try {
-            // Simula el guardado (reemplaza por lógica real)
             if (userName.trim() === "") {
                 alert('El nombre de usuario no puede estar vacío.');
                 return;
             }
 
-            const selectedETLs = etlStates.filter(e => e.enabled).map(e => e.id);
+            const selectedETLIds = etlStates
+                .filter(e => e.enabled)
+                .map(e => parseInt(e.id)); // Convertimos de string a number
 
-            // Simulación de guardado:
-            console.log("Guardando usuario:", userName);
-            console.log("ETLs seleccionados:", selectedETLs);
+            if (selectedETLIds.length === 0) {
+                alert('Debes seleccionar al menos un ETL.');
+                return;
+            }
 
-            // await fetch(...);
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Token de autenticación no encontrado.');
+                return;
+            }
 
-            alert(`Usuario ${userName} ha obtenido permisos de ${selectedETLs} correctamente.`);
+            const response = await crearNuevoUsuario({
+                nombreUsuario: userName.trim(),
+                etlIds: selectedETLIds
+            }, token);
+
+            alert(`✅ ${response.mensaje}\nID: ${response.idUsuario}\nETLs asignados: ${response.etlIdsAsignados.join(', ')}`);
+            navigate(-1)
         } catch (error) {
-            console.log(error);
-            alert('No se pudo guardar el usuario.');
+            console.error(error);
+            alert('❌ Error al guardar el usuario.');
         }
     };
+
 
     const enabledETLs = etlStates.filter(e => e.enabled);
     const availableETLs = etlStates.filter(e =>
@@ -96,7 +119,7 @@ export default function NewUserScreen() {
             {/* Input de nombre de nuevo usuario */}
             <View style={{ alignItems: 'center', marginTop: 40 }}>
                 <TextInput
-                    placeholder="Nombre del usuario"
+                    placeholder="Usuario del directorio activo"
                     onChangeText={setUserName}
                     value={userName}
                     placeholderTextColor={isDark ? '#aaa' : '#888'}

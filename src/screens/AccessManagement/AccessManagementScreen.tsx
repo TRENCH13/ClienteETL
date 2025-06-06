@@ -1,76 +1,70 @@
-import {Pressable, Text, View} from "react-native";
-import {styles} from "./AccessManagementStyles.ts";
+import { Pressable, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { styles } from "./AccessManagementStyles.ts";
 import PageLayout from "../../components/PageLayout.tsx";
 import ReusableTable from "../../components/Table.tsx";
-import {useNavigate} from "react-router-dom";
-import {useState} from "react";
-import {useTheme} from "../../context/ThemeContext.tsx";
+import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext.tsx";
+import { getTodosLosUsuarios, Usuario } from "../../services/UsuarioService.ts";
 
 export default function AccessManagementScreen() {
-    const navigate = useNavigate()
-    const { theme } = useTheme()
-    const isDark = theme === 'dark'
+    const navigate = useNavigate();
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
 
-    const [isAscending, setIsAscending] = useState(true);
-    const [currentPage, setCurrentPage] = useState(0)
+    const [currentPage, setCurrentPage] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
+    const [sortedData, setSortedData] = useState<{ id: string; name: string; role: string; createdAt: string }[]>([]);
 
-    const rowsPerPage = 5
+    const rowsPerPage = 5;
 
-    const [sortedData, setSortedData] = useState([
-        { id: '001', name: 'Cristiano Ronaldo', role: 'Administrador', etlAccess: 20 },
-        { id: '002', name: 'Taylor Swift', role: 'Consultor', etlAccess: 13 },
-        { id: '003', name: 'Tom Brady', role: 'Consultor', etlAccess: 2 },
-        { id: '004', name: 'Guillermo del Toro', role: 'Consultor', etlAccess: 1 },
-        { id: '005', name: 'Gabriel Montiel', role: 'Consultor', etlAccess: 6 },
-        { id: '006', name: 'Stephen Curry', role: 'Administrador', etlAccess: 50 },
-        { id: '007', name: 'Ariana Grande', role: 'Consultor', etlAccess: 13 },
-        { id: '008', name: 'Michael Jordan', role: 'Consultor', etlAccess: 2 },
-        { id: '009', name: 'Sabrina Carpenter', role: 'Consultor', etlAccess: 1 },
-        { id: '010', name: 'Luisito Rey', role: 'Consultor', etlAccess: 6 },
-    ]);
+    useEffect(() => {
+        const cargarUsuarios = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return;
 
+            try {
+                const usuarios = await getTodosLosUsuarios(token);
 
-    const handleSort = (key: string) => {
-        if (key === 'etlAccess') toggleSort();
-    };
+                const parsed = usuarios.map((u: Usuario) => ({
+                    id: String(u.id),
+                    name: u.nombre,
+                    role: u.rol,
+                    createdAt: new Date(u.createdAt).toLocaleDateString('es-MX')  // dd/mm/aaaa
+                }));
 
-    const toggleSort = () => {
-        const sorted = [...sortedData].sort((a, b) => {
-            if (isAscending) {
-                return a.etlAccess - b.etlAccess;
-            } else {
-                return b.etlAccess - a.etlAccess;
+                setSortedData(parsed);
+            } catch (error) {
+                console.error("Error al obtener usuarios:", error);
             }
-        });
-        setSortedData(sorted);
-        setIsAscending(!isAscending);
-        setCurrentPage(0);
-    };
+        };
+
+        void cargarUsuarios();
+    }, []);
 
     const filteredData = sortedData.filter(item =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.etlAccess.toString().includes(searchQuery)
+        item.createdAt.includes(searchQuery)
     );
+
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
     const startIndex = currentPage * rowsPerPage;
     const currentRows = filteredData.slice(startIndex, startIndex + rowsPerPage);
 
     const handlePrevious = () => {
-        if (currentPage > 0) setCurrentPage(currentPage - 1)
-    }
+        if (currentPage > 0) setCurrentPage(currentPage - 1);
+    };
 
     const handleNext = () => {
-        if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1)
-    }
+        if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1);
+    };
 
     const headers = [
         { key: 'name', label: 'Nombre del Usuario' },
         { key: 'role', label: 'Rol' },
-        { key: 'etlAccess', label: 'No. de Accesos a ETLs', sortable: true, ascending: isAscending }
+        { key: 'createdAt', label: 'Fecha de Creación' }
     ];
-
 
     return (
         <PageLayout>
@@ -112,8 +106,7 @@ export default function AccessManagementScreen() {
                 headers={headers}
                 data={currentRows}
                 isDark={isDark}
-                onSort={handleSort}
-                renderRow={(item) => [item.name, item.role, item.etlAccess]}
+                renderRow={(item) => [item.name, item.role, item.createdAt]}
                 onRowClick={(item) =>
                     navigate(`/accessmanage/edituser?id=${item.id}&name=${encodeURIComponent(item.name)}`)
                 }

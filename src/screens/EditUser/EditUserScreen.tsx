@@ -9,6 +9,8 @@ import {useTheme} from "../../context/ThemeContext.tsx";
 import PageLayout from "../../components/PageLayout.tsx";
 import BackButton from "../../components/BackButton.tsx";
 import SearchBar from "../../components/SearchBar.tsx";
+import { getTodosLosEtls } from "../../services/EtlService.ts";
+import { getPermisosDeUsuario, actualizarPermisosUsuario } from "../../services/UsuarioService.ts";
 import {useState, useEffect} from "react";
 import { useLocation } from "react-router-dom";
 
@@ -27,22 +29,31 @@ export default function EditUserScreen() {
     const [allEnabled, setAllEnabled] = useState(false);
 
     useEffect(() => {
-        setEtlStates([
-            { id: '001', name: 'ETL Ingresos', enabled: true },
-            { id: '013', name: 'ETL Ventas', enabled: true },
-            { id: '007', name: 'ETL Logística', enabled: false },
-            { id: '042', name: 'ETL Finanzas', enabled: false },
-            { id: '043', name: 'ETL Financiera', enabled: false },
-            { id: '044', name: 'ETL Financiera', enabled: false },
-            { id: '045', name: 'ETL Financiera', enabled: false },
-            { id: '046', name: 'ETL Financiera', enabled: false },
-            { id: '008', name: 'ETL Logística', enabled: false },
-            { id: '049', name: 'ETL Finanzas', enabled: false },
-            { id: '050', name: 'ETL Financiera', enabled: false },
-            { id: '051', name: 'ETL Financiera', enabled: false },
-            { id: '052', name: 'ETL Financiera', enabled: false },
-            { id: '053', name: 'ETL Financiera', enabled: false },
-        ]);
+        const cargarETLsConPermisos = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const [todosLosEtls, permisosUsuario] = await Promise.all([
+                    getTodosLosEtls(token),
+                    getPermisosDeUsuario(Number(userId), token)
+                ]);
+
+                const etlIdsConPermiso = new Set(permisosUsuario.permisos.map(p => p.idEtl));
+
+                const resultado = todosLosEtls.map(etl => ({
+                    id: String(etl.id),
+                    name: etl.nombre,
+                    enabled: etlIdsConPermiso.has(etl.id)
+                }));
+
+                setEtlStates(resultado);
+            } catch (error) {
+                console.error("Error al cargar ETLs o permisos:", error);
+            }
+        };
+
+        void cargarETLsConPermisos();
     }, [userId]);
 
     useEffect(() => {
@@ -65,23 +76,22 @@ export default function EditUserScreen() {
 
     const handleSave = async () => {
         try {
-            if (userName.trim() === "") {
-                alert('El nombre de usuario no puede estar vacío.');
-                return;
-            }
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('Token no encontrado.');
 
-            const selectedETLs = etlStates.filter(e => e.enabled).map(e => e.id);
-            console.log("Guardando usuario:", userName);
-            console.log("ETLs seleccionados:", selectedETLs);
+            const selectedETLIds = etlStates
+                .filter(etl => etl.enabled)
+                .map(etl => Number(etl.id));
 
-            // await fetch(...);
+            const res = await actualizarPermisosUsuario(Number(userId), selectedETLIds, token);
 
-            alert(`Permisos de ${userName} actualizados correctamente.`);
+            alert(res.mensaje);
         } catch (error) {
-            console.log(error);
-            alert('No se pudo guardar el usuario.');
+            console.error("Error al actualizar permisos:", error);
+            alert('❌ No se pudo actualizar los permisos del usuario.');
         }
     };
+
 
     const enabledETLs = etlStates.filter(e => e.enabled);
     const availableETLs = etlStates.filter(e =>
@@ -95,7 +105,11 @@ export default function EditUserScreen() {
             <BackButton />
 
             <Text style={[styles.title, isDark && styles.titleDark]}>
-                Gestión de Permisos de {userName}
+                Gestión de Permisos de
+            </Text>
+
+            <Text style={[styles.subtitle, isDark && styles.subtitleDark]}>
+                {userName}
             </Text>
 
             <View style={{ alignItems: 'center', marginTop: 40 }}>
