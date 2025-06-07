@@ -42,6 +42,13 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
             const err = error as AxiosErrorWithResponse;
             const { status, data } = err.response;
 
+            if (status === 401) {
+                throw {
+                    code: 401,
+                    message: 'Credenciales incorrectas.',
+                };
+            }
+
             throw {
                 code: status,
                 message: data?.mensaje || 'Error desconocido al iniciar sesión.',
@@ -50,7 +57,7 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
 
         throw {
             code: 0,
-            message: 'Error de red o servidor no disponible.',
+            message: 'No hay conexión con el servidor.',
         };
     }
 };

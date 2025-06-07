@@ -31,6 +31,9 @@ export default function MorningReportScreen() {
     const [modalVisible, setModalVisible] = useState(false);
     const [seleccionados, setSeleccionados] = useState<number[]>([]);
     const [etlList, setEtlList] = useState<FlatReporte[]>([]);
+    const [huboError, setHuboError] = useState(false);
+    const [intentoCargado, setIntentoCargado] = useState(false);
+
 
     const etlHeaders = [
         { key: 'id', label: 'ID del Reporte' },
@@ -62,8 +65,12 @@ export default function MorningReportScreen() {
 
             setEtlList(planos);
             setReportesCriticos(criticos);
+            setHuboError(false); // éxito
         } catch (err) {
             console.error('Error al cargar reportes:', err);
+            setHuboError(true); // marca error
+        } finally {
+            setIntentoCargado(true); // ya se intentó cargar, éxito o fallo
         }
     };
 
@@ -130,13 +137,24 @@ export default function MorningReportScreen() {
                         Reportes del día:
                     </Text>
 
-                    <ReusableTable
-                        headers={etlHeaders}
-                        data={etlList}
-                        isDark={isDark}
-                        renderRow={(item) => [item.id, item.name, item.type, item.detail]}
-                    />
+                    {huboError ? (
+                        <Text style={{ color: isDark ? '#fff' : '#000', marginTop: 10 }}>
+                            No se pudo conectar con el servidor. Intenta nuevamente más tarde.
+                        </Text>
+                    ) : intentoCargado && etlList.length === 0 ? (
+                        <Text style={{ color: isDark ? '#fff' : '#000', marginTop: 10 }}>
+                            No hay reportes disponibles para el día de hoy.
+                        </Text>
+                    ) : (
+                        <ReusableTable
+                            headers={etlHeaders}
+                            data={etlList}
+                            isDark={isDark}
+                            renderRow={(item) => [item.id, item.name, item.type, item.detail]}
+                        />
+                    )}
                 </View>
+
             </PageLayout>
 
             {/* Modal */}

@@ -5,7 +5,6 @@ import {
     Pressable,
     Image,
     ActivityIndicator,
-    Alert,
 } from 'react-native';
 import { useState } from 'react';
 import { styles } from './LoginStyles';
@@ -36,9 +35,9 @@ export default function LoginScreen() {
                 'message' in err &&
                 typeof (err as { message: unknown }).message === 'string'
             ) {
-                Alert.alert('Error', (err as { message: string }).message);
+                alert('Error al iniciar sesión, revise sus credenciales o compruebe la conexión con el servidor') //(err as { message: string }).message);
             } else {
-                Alert.alert('Error', 'Error desconocido al iniciar sesión.');
+                alert('Error desconocido al iniciar sesión')//'Error desconocido al iniciar sesión.');
             }
         } finally {
             setIsLoading(false);

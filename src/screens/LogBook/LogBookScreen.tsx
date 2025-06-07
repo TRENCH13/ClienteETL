@@ -25,6 +25,9 @@ export default function LogBookScreen() {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
     const [etlList, setEtlList] = useState<ETLReport[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [huboError, setHuboError] = useState(false);
+    const [intentoCargado, setIntentoCargado] = useState(false);
+
 
     const etlHeaders = [
         { key: 'id', label: 'ID del ETL' },
@@ -47,6 +50,8 @@ export default function LogBookScreen() {
             console.log("Buscando reportes reales para:", formatted);
 
             setIsLoading(true);
+            setHuboError(false);
+            setIntentoCargado(false);
             try {
                 const data = await getReportesPorFecha(formatted, token);
                 const parsed: ETLReport[] = data.map((reporte: Reporte) => ({
@@ -58,9 +63,13 @@ export default function LogBookScreen() {
                 setEtlList(parsed);
             } catch (error) {
                 console.error("Error al cargar reportes por fecha:", error);
+                setHuboError(true);
+                console.log(huboError);
+                console.log(intentoCargado);
                 setEtlList([]);
             } finally {
                 setIsLoading(false);
+                setIntentoCargado(true);
             }
         };
 
@@ -106,6 +115,14 @@ export default function LogBookScreen() {
                 {isLoading ? (
                     <Text style={{ marginTop: 12, fontStyle: 'italic', color: isDark ? '#ccc' : '#555' }}>
                         Cargando reportes...
+                    </Text>
+                ) : huboError ? (
+                    <Text style={{ marginTop: 12, color: isDark ? '#fff' : '#000' }}>
+                        No se pudo conectar con el servidor. Intenta nuevamente más tarde.
+                    </Text>
+                ) : intentoCargado && etlList.length === 0 ? (
+                    <Text style={{ marginTop: 12, color: isDark ? '#fff' : '#000' }}>
+                        No hay reportes para la fecha seleccionada.
                     </Text>
                 ) : (
                     <ReusableTable
