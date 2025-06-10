@@ -25,6 +25,7 @@ export default function NewUserScreen() {
     const [etlStates, setEtlStates] = useState<{ id: string, name: string, enabled: boolean }[]>([]);
     const [allEnabled, setAllEnabled] = useState(false);
     const [userName, setUserName] = useState('');
+    const [rol, setRol] = useState<'Consultor' | 'Administrador'>('Consultor');
 
     useEffect(() => {
         const cargarETLs = async () => {
@@ -90,6 +91,7 @@ export default function NewUserScreen() {
 
             const response = await crearNuevoUsuario({
                 nombreUsuario: userName.trim(),
+                rol: rol,
                 etlIds: selectedETLIds
             }, token);
 
@@ -137,6 +139,23 @@ export default function NewUserScreen() {
                     }}
                 />
             </View>
+
+            <select
+                value={rol}
+                onChange={(e) => setRol(e.target.value as 'Consultor' | 'Administrador')}
+                style={{
+                    padding: 10,
+                    borderRadius: 6,
+                    border: '1px solid #ccc',
+                    width: '20%',
+                    marginTop: 20,
+                    fontSize: 14,
+                    alignSelf: 'center',
+                }}
+            >
+                <option>Consultor</option>
+                <option>Administrador</option>
+            </select>
 
             {/* ETLs activados */}
             <Text style={[styles.subtitle, isDark && styles.subtitleDark]}>

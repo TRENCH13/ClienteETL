@@ -181,8 +181,10 @@ export default function MorningReportScreen() {
                                 reporte.etl.tipoEtl,
                                 <input
                                     type="checkbox"
-                                    checked={seleccionados.includes(reporte.idReporte)}
+                                    data-testid="modal-confirm-checkbox"
+                                    checked={reporte.idReporte != null && seleccionados.includes(reporte.idReporte)}
                                     onChange={() => {
+                                        if (reporte.idReporte == null) return;
                                         setSeleccionados(prev =>
                                             prev.includes(reporte.idReporte)
                                                 ? prev.filter(id => id !== reporte.idReporte)

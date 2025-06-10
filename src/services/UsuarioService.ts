@@ -11,12 +11,14 @@ export type Usuario = {
 
 export type NuevoUsuarioPayload = {
     nombreUsuario: string;
+    rol: 'Administrador' | 'Consultor';
     etlIds: number[];
 };
 
 export type UsuarioCreadoResponse = {
     idUsuario: number;
     nombreUsuario: string;
+    rol: 'Administrador' | 'Consultor';
     etlIdsAsignados: number[];
     mensaje: string;
 };
