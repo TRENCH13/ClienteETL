@@ -14,6 +14,7 @@ import {
     Reporte
 } from "../../services/ReporteService.ts";
 import ReusableTable from "../../components/Table.tsx";
+import { useNavigate } from 'react-router-dom';
 
 type FlatReporte = {
     id: string;
@@ -25,6 +26,8 @@ type FlatReporte = {
 export default function MorningReportScreen() {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
+    const navigate = useNavigate();
+
 
 
     const [reportesCriticos, setReportesCriticos] = useState<Reporte[]>([]);
@@ -151,6 +154,7 @@ export default function MorningReportScreen() {
                             data={etlList}
                             isDark={isDark}
                             renderRow={(item) => [item.id, item.name, item.type, item.detail]}
+                            onRowClick={(item) => navigate(`/reportdetails/${item.id}`)}
                         />
                     )}
                 </View>

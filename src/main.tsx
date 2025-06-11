@@ -10,6 +10,7 @@ import AccessManagementScreen from "./screens/AccessManagement/AccessManagementS
  import NewUserScreen from "./screens/NewUser/NewUserScreen.tsx";
  import EditUserScreen from "./screens/EditUser/EditUserScreen.tsx";
  import RoleBasedMorningScreen from "./screens/RoleBasedMoringReport/RoleBasedMorningScreen.tsx";
+ import ReportDetailsScreen from "./screens/ReportDetails/ReportDetailsScreen.tsx";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
@@ -24,6 +25,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     <Route path="/accessmanage/newuser" element={<NewUserScreen />} />
                     <Route path="/accessmanage/edituser" element={<EditUserScreen />} />
                     <Route path="/morning" element={<RoleBasedMorningScreen />} />
+                    <Route path="/reportdetails/:id" element={<ReportDetailsScreen />} />
                 </Routes>
             </BrowserRouter>
         </ThemeProvider>

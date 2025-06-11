@@ -7,12 +7,14 @@ import { styles } from "./LogBookStyles.ts";
 import { useTheme } from "../../context/ThemeContext.tsx";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { es } from 'date-fns/locale';
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 type ETLReport = {
-    id: string;
+    id: string;        // idReporte
+    etlId: string;     // id del ETL (opcional, solo visual)
     name: string;
     type: string;
     detail: string;
@@ -21,6 +23,7 @@ type ETLReport = {
 export default function LogBookScreen() {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
+    const navigate = useNavigate();
 
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
     const [etlList, setEtlList] = useState<ETLReport[]>([]);
@@ -28,9 +31,8 @@ export default function LogBookScreen() {
     const [huboError, setHuboError] = useState(false);
     const [intentoCargado, setIntentoCargado] = useState(false);
 
-
     const etlHeaders = [
-        { key: 'id', label: 'ID del ETL' },
+        { key: 'id', label: 'ID del Reporte' },
         { key: 'name', label: 'Nombre del ETL' },
         { key: 'type', label: 'Tipo' },
         { key: 'detail', label: 'Detalle' }
@@ -47,15 +49,14 @@ export default function LogBookScreen() {
             }
 
             const formatted = format(selectedDate, "yyyy-MM-dd");
-            console.log("Buscando reportes reales para:", formatted);
-
             setIsLoading(true);
             setHuboError(false);
             setIntentoCargado(false);
             try {
                 const data = await getReportesPorFecha(formatted, token);
                 const parsed: ETLReport[] = data.map((reporte: Reporte) => ({
-                    id: String(reporte.etl.idEtl),
+                    id: String(reporte.idReporte),  // lo que usarás para redireccionar
+                    etlId: String(reporte.etl.idEtl),
                     name: reporte.etl.nombreEtl,
                     type: reporte.etl.tipoEtl,
                     detail: reporte.statusReporte
@@ -64,8 +65,6 @@ export default function LogBookScreen() {
             } catch (error) {
                 console.error("Error al cargar reportes por fecha:", error);
                 setHuboError(true);
-                console.log(huboError);
-                console.log(intentoCargado);
                 setEtlList([]);
             } finally {
                 setIsLoading(false);
@@ -75,7 +74,6 @@ export default function LogBookScreen() {
 
         fetchData();
     }, [selectedDate]);
-
 
     return (
         <PageLayout>
@@ -130,6 +128,7 @@ export default function LogBookScreen() {
                         data={etlList}
                         isDark={isDark}
                         renderRow={(item) => [item.id, item.name, item.type, item.detail]}
+                        onRowClick={(item) => navigate(`/reportdetails/${item.id}`)}
                     />
                 )}
             </View>

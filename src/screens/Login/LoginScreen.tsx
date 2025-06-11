@@ -6,7 +6,7 @@ import {
     Image,
     ActivityIndicator,
 } from 'react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { styles } from './LoginStyles';
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -20,29 +20,34 @@ export default function LoginScreen() {
     const navigate = useNavigate();
 
     const handleLogin = async () => {
+        if (!username.trim()) return; // evita login si está vacío
         setIsLoading(true);
         try {
             const response = await login({ nombreUsuario: username });
-            console.log(response.usuario.nombre);
             localStorage.setItem("user", JSON.stringify(response.usuario));
             localStorage.setItem("token", response.token);
-            console.log(response.usuario);
             navigate('/morning');
         } catch (err: unknown) {
-            if (
-                typeof err === 'object' &&
-                err !== null &&
-                'message' in err &&
-                typeof (err as { message: unknown }).message === 'string'
-            ) {
-                alert('Error al iniciar sesión, revise sus credenciales o compruebe la conexión con el servidor') //(err as { message: string }).message);
-            } else {
-                alert('Error desconocido al iniciar sesión')//'Error desconocido al iniciar sesión.');
-            }
+            alert(
+                'Error al iniciar sesión, revise sus credenciales o compruebe la conexión con el servidor'
+            );
         } finally {
             setIsLoading(false);
         }
     };
+
+    // Detectar tecla Enter
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Enter') {
+                handleLogin();
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [username]); // depende del username para evitar login con vacío
 
     return (
         <View style={[styles.root, isDark && styles.rootDark]}>
